@@ -138,6 +138,56 @@ export const CELESTIAL_MODELS_DATA = [
     modelPath: '/mars.glb',
     color: '#f97316',
     sitesTarget: 'mars'
+  },
+  {
+    id: 'apollo',
+    name: 'APOLLO LUNAR MODULE',
+    tag: 'CREWED LUNAR LANDER // 04',
+    format: 'GLTF 2.0 Binary (.glb)',
+    filesize: '700 KB',
+    scale: '1:1 Scale Spacecraft Asset',
+    polygons: '35,600 Triangles',
+    textures: 'PBR Thermal Gold Foil & Mylar Metalness',
+    features: [
+      'Grumman Descent & Ascent Stage Geometry',
+      'Deployable Lunar Surface Sensing Probes',
+      'High-Gain S-Band Steerable Antenna Dish',
+      'Tranquility Base Regolith Landing Footpads'
+    ],
+    diameter: '9.45 M (Leg Span)',
+    orbitSpeed: 'Lunar Surface Landing (0 KM/H)',
+    atmosphere: 'Tranquility Base (Lunar Vacuum)',
+    nasaSource: 'NASA / Michael D. Carbajal',
+    creditLine: 'Credit: NASA / Michael D. Carbajal',
+    license: 'Public Domain / Free for Educational & Informational Use (NASA Guidelines)',
+    modelPath: '/apollo-lunar-module.glb',
+    color: '#f59e0b',
+    sitesTarget: 'moon'
+  },
+  {
+    id: 'pioneer',
+    name: 'PIONEER 10 SPACECRAFT',
+    tag: 'DEEP SPACE EXPLORER // 05',
+    format: 'GLTF 2.0 Binary (.glb)',
+    filesize: '1.95 MB',
+    scale: '1:1 Scale Spacecraft Asset',
+    polygons: '22,400 Triangles',
+    textures: 'PBR Parabolic Dish & SNAP-19 RTG Elements',
+    features: [
+      '2.74-meter High-Gain Parabolic Reflector Dish',
+      'Dual SNAP-19 Radioisotope Thermoelectric Generators',
+      'Magnetometer Boom & Cosmic Ray Sensor Suite',
+      'Carl Sagan Golden Interstellar Message Plaque'
+    ],
+    diameter: '2.74 M (Dish Diameter)',
+    orbitSpeed: '43,000 KM/H (Interstellar Escape)',
+    atmosphere: 'Interstellar Vacuum (Beyond Heliopause)',
+    nasaSource: 'NASA / JPL / Eyes on the Solar System',
+    creditLine: 'Credit: NASA / JPL / Eyes on the Solar System',
+    license: 'Public Domain / Free for Educational & Informational Use (NASA Guidelines)',
+    modelPath: '/pioneer-10.glb',
+    color: '#6366f1',
+    sitesTarget: 'mars'
   }
 ];
 
@@ -145,6 +195,7 @@ export const HOTSPOTS_DATA = {
   moon: [
     {
       id: 'apollo-lms',
+      modelId: 'apollo',
       title: 'Apollo Lunar Modules',
       targetName: 'Apollo Lunar Modules',
       shortLabel: 'Apollo LM',
@@ -411,6 +462,7 @@ export const HOTSPOTS_DATA = {
     },
     {
       id: 'pioneer-10-11',
+      modelId: 'pioneer',
       title: 'Pioneer 10 & 11',
       targetName: 'Pioneer 10 & 11',
       shortLabel: 'Pioneer 10 & 11',

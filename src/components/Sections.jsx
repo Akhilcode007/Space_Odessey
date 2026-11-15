@@ -233,6 +233,25 @@ export default function Sections({
               </div>
 
               {/* Primary Action Button */}
+              {activeArtifact?.modelId && (
+                <button
+                  onClick={() => {
+                    soundManager.playTargetLock();
+                    onSelectModelId?.(activeArtifact.modelId);
+                    onNavigate('models');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-xs font-mono font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mb-2.5 border border-cyan-400/40"
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    boxShadow: '0 0 25px rgba(14, 165, 233, 0.4)'
+                  }}
+                >
+                  <Box className="w-4 h-4 text-cyan-300" />
+                  <span>INSPECT 3D MODEL ({activeArtifact.modelId.toUpperCase()})</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   soundManager.playTargetLock();
@@ -251,10 +270,24 @@ export default function Sections({
 
               {/* Secondary Direct Access Button */}
               <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 pt-1">
-                <span className="flex items-center gap-1.5 text-zinc-400">
-                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>DIRECT 3D SURFACE ACCESS</span>
-                </span>
+                {activeArtifact?.modelId ? (
+                  <button
+                    onClick={() => {
+                      soundManager.playTargetLock();
+                      onSelectModelId?.(activeArtifact.modelId);
+                      onNavigate('models');
+                    }}
+                    className="flex items-center gap-1.5 text-cyan-400 hover:text-white transition-colors"
+                  >
+                    <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>DIRECT 3D MODEL ACCESS</span>
+                  </button>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-zinc-400">
+                    <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>DIRECT 3D SURFACE ACCESS</span>
+                  </span>
+                )}
                 <span className="text-zinc-500">PRESS [ESC] TO DESELECT</span>
               </div>
             </div>
@@ -317,7 +350,12 @@ export default function Sections({
                   key={spot.id}
                   onClick={() => {
                     soundManager.playTargetLock();
-                    onSelectHotspot(spot);
+                    if (spot.modelId) {
+                      onSelectModelId?.(spot.modelId);
+                      onNavigate('models');
+                    } else {
+                      onSelectHotspot(spot);
+                    }
                   }}
                   className={`w-full text-left p-4 rounded-2xl transition-all duration-300 flex items-center justify-between group border backdrop-blur-xl ${
                     isSelected
@@ -331,9 +369,16 @@ export default function Sections({
                   }}
                 >
                   <div className="min-w-0 pr-3">
-                    <h4 className="text-sm font-bold font-sans tracking-tight text-white group-hover:text-cyan-200 transition-colors leading-snug">
-                      {spot.title}
-                    </h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-bold font-sans tracking-tight text-white group-hover:text-cyan-200 transition-colors leading-snug">
+                        {spot.title}
+                      </h4>
+                      {spot.modelId && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider shrink-0">
+                          3D MODEL
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs font-mono text-zinc-400 truncate mt-1">
                       {spot.site}
                     </p>
@@ -382,12 +427,14 @@ export default function Sections({
             </div>
 
             {/* Model Selector Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-full bg-black/80 border border-white/15 backdrop-blur-xl shadow-2xl">
+            <div className="flex items-center gap-1.5 p-1 rounded-full bg-black/80 border border-white/15 backdrop-blur-xl shadow-2xl flex-wrap">
               {[
                 { id: 'earth', label: '01. EARTH' },
                 { id: 'moon', label: '02. MOON' },
                 { id: 'mars', label: '03. MARS' },
-                { id: 'all', label: '04. TRIPLE VIEW' }
+                { id: 'apollo', label: '04. APOLLO LM' },
+                { id: 'pioneer', label: '05. PIONEER 10' },
+                { id: 'all', label: '06. TRIPLE VIEW' }
               ].map((tab) => {
                 const isActive = selectedModelId === tab.id;
                 return (
@@ -421,7 +468,11 @@ export default function Sections({
                 className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-3xl pointer-events-none opacity-25"
                 style={{
                   backgroundColor:
-                    selectedModelId === 'mars'
+                    selectedModelId === 'apollo'
+                      ? '#f59e0b'
+                      : selectedModelId === 'pioneer'
+                      ? '#6366f1'
+                      : selectedModelId === 'mars'
                       ? '#f97316'
                       : selectedModelId === 'moon'
                       ? '#e2e8f0'
@@ -503,6 +554,28 @@ export default function Sections({
                 </span>
               </div>
 
+              {/* Official NASA Attribution & Credit Line */}
+              {(currentModelMeta?.creditLine || currentModelMeta?.nasaSource) && (
+                <div className="p-3 rounded-2xl bg-black/60 border border-white/10 mb-4 font-mono text-[11px]">
+                  <div className="flex items-center justify-between text-zinc-400 mb-1">
+                    <span className="uppercase text-[9px] tracking-wider text-zinc-500 font-bold">
+                      NASA 3D RESOURCES ATTRIBUTION
+                    </span>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      PUBLIC DOMAIN
+                    </span>
+                  </div>
+                  <div className="text-white font-semibold text-xs">
+                    {currentModelMeta?.creditLine || currentModelMeta?.nasaSource}
+                  </div>
+                  {currentModelMeta?.license && (
+                    <div className="text-[10px] text-zinc-400 mt-1 leading-relaxed">
+                      {currentModelMeta.license}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center gap-2.5">
                 {selectedModelId !== 'all' && (
@@ -513,7 +586,7 @@ export default function Sections({
                     }}
                     className="w-full sm:flex-1 liquid-metal-btn flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-mono font-bold text-white tracking-wider shadow-lg"
                   >
-                    <span>EXPLORE {selectedModelId.toUpperCase()} SITES</span>
+                    <span>EXPLORE {currentModelMeta?.sitesTarget?.toUpperCase() || 'MOON'} SITES</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 )}

@@ -13,6 +13,14 @@ const models = [
   {
     name: 'mars.glb',
     url: 'https://solarsystem.nasa.gov/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBdEFRIiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--9ddbf780bb3c564b8e561bb238a2f6713d445c42/Mars_1_6792.glb'
+  },
+  {
+    name: 'apollo-lunar-module.glb',
+    url: 'https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/model/apollo-lunar-module/Apollo%20Lunar%20Module.glb'
+  },
+  {
+    name: 'pioneer-10.glb',
+    url: 'https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/model/pioneer-10/Pioneer%2010.glb'
   }
 ];
 
