@@ -4,33 +4,75 @@ import Header from './components/Header';
 import HUD from './components/HUD';
 import Sections from './components/Sections';
 import ArtifactModal from './components/ArtifactModal';
+import QuizModal from './components/QuizModal';
+import SpaceGame from './components/SpaceGame';
 import { soundManager } from './utils/audio';
+import { HOTSPOTS_DATA } from './data/spaceData';
+
+const SECTIONS = ['earth', 'moon', 'mars', 'models'];
 
 export default function App() {
   const [activePlanet, setActivePlanet] = useState('earth');
   const [selectedHotspot, setSelectedHotspot] = useState(null);
+  const [selectedModelId, setSelectedModelId] = useState('earth');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const scrollContainerRef = useRef(null);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isGameOpen, setIsGameOpen] = useState(false);
+  const [isGameUnlocked, setIsGameUnlocked] = useState(() => {
+    try {
+      return localStorage.getItem('space_game_unlocked') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const isTransitioning = useRef(false);
 
-  // Track global scroll percentage for HUD & Telemetry
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0) {
-        const progress = Math.min(1, Math.max(0, window.scrollY / totalHeight));
-        setScrollProgress(progress);
-      }
-    };
+  // Calculate HUD progress from active section
+  const progressMap = {
+    earth: 0.05,
+    moon: 0.42,
+    mars: 0.75,
+    models: 1.0,
+    archive: 1.0
+  };
+  const scrollProgress = progressMap[activePlanet] || 0.05;
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Discrete Step Navigation between separated sections
+  const handleNavigate = (targetId) => {
+    if (targetId === activePlanet) return;
+    soundManager.playTransition();
+    setSelectedHotspot(null);
+    setActivePlanet(targetId);
+  };
 
-  // Listen for Escape key to close open cards
+  const handleNextSection = () => {
+    const currentIndex = SECTIONS.indexOf(activePlanet);
+    if (currentIndex < SECTIONS.length - 1) {
+      handleNavigate(SECTIONS[currentIndex + 1]);
+    }
+  };
+
+  const handlePrevSection = () => {
+    const currentIndex = SECTIONS.indexOf(activePlanet);
+    if (currentIndex > 0) {
+      handleNavigate(SECTIONS[currentIndex - 1]);
+    }
+  };
+
+  // Keyboard Navigation: Arrow Keys & Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        if (isGameOpen) {
+          setIsGameOpen(false);
+          soundManager.playBlip(500, 0.05);
+          return;
+        }
+        if (isQuizOpen) {
+          setIsQuizOpen(false);
+          soundManager.playBlip(500, 0.05);
+          return;
+        }
         if (selectedHotspot) {
           setSelectedHotspot(null);
           soundManager.playBlip(500, 0.05);
@@ -39,60 +81,82 @@ export default function App() {
           setIsModalOpen(false);
           soundManager.playBlip(500, 0.05);
         }
+        return;
+      }
+
+      if (isModalOpen || selectedHotspot || isQuizOpen || isGameOpen) return;
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        handleNextSection();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        handlePrevSection();
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedHotspot, isModalOpen]);
+  }, [activePlanet, selectedHotspot, isModalOpen, isQuizOpen, isGameOpen]);
 
-  // Smooth scroll to a target section
-  const handleScrollTo = (sectionId) => {
-    const elem = document.getElementById(`section-${sectionId}`);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  // Mouse Wheel stepped transition (debounced)
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (isModalOpen || selectedHotspot || isQuizOpen || isGameOpen) return;
 
-  // Hotspot selection handler
-  const handleSelectHotspot = (spot) => {
-    setSelectedHotspot(spot);
-  };
+      if (isTransitioning.current) return;
 
-  const handleCloseHotspot = () => {
-    setSelectedHotspot(null);
-  };
+      if (Math.abs(e.deltaY) > 40) {
+        isTransitioning.current = true;
+        if (e.deltaY > 0) {
+          handleNextSection();
+        } else {
+          handlePrevSection();
+        }
+        setTimeout(() => {
+          isTransitioning.current = false;
+        }, 750);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [activePlanet, selectedHotspot, isModalOpen, isQuizOpen, isGameOpen]);
 
   return (
-    <div className="relative min-h-screen bg-[#08080a] text-zinc-100 selection:bg-white/20 selection:text-white">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#08080a] text-zinc-100 selection:bg-white/20 selection:text-white">
       {/* Nothing OS Subtle Dot Grid Background */}
       <div className="fixed inset-0 pointer-events-none nothing-dot-grid z-0 opacity-40" />
 
       {/* 1. Fixed Background 3D Canvas */}
       <SpaceCanvas
         selectedHotspot={selectedHotspot}
-        onSelectHotspot={handleSelectHotspot}
-        onCloseHotspot={handleCloseHotspot}
+        onSelectHotspot={setSelectedHotspot}
+        onCloseHotspot={() => setSelectedHotspot(null)}
         activePlanet={activePlanet}
-        setActivePlanet={setActivePlanet}
-        scrollContainerRef={scrollContainerRef}
+        selectedModelId={selectedModelId}
+        onSelectModelId={setSelectedModelId}
       />
 
-      {/* 2. Top Header Overlay (Nothing OS inspired) */}
+      {/* 2. Top Header Overlay */}
       <Header
         activePlanet={activePlanet}
-        onNavigate={handleScrollTo}
+        onNavigate={handleNavigate}
         onOpenDirectory={() => setIsModalOpen(true)}
-        totalHotspots={6}
+        totalHotspots={HOTSPOTS_DATA.moon.length + HOTSPOTS_DATA.mars.length}
+        isGameUnlocked={isGameUnlocked}
+        onOpenQuiz={() => setIsQuizOpen(true)}
+        onLaunchGame={() => setIsGameOpen(true)}
       />
 
-      {/* 3. Main Transparent Scroll Container */}
-      <main ref={scrollContainerRef} className="relative z-10">
+      {/* 3. Main Separated Sections Viewport */}
+      <main className="relative z-10 w-full h-full flex items-center justify-center pointer-events-none">
         <Sections
           activePlanet={activePlanet}
           selectedHotspot={selectedHotspot}
-          onSelectHotspot={handleSelectHotspot}
+          onSelectHotspot={setSelectedHotspot}
           onOpenDirectory={() => setIsModalOpen(true)}
-          onScrollTo={handleScrollTo}
+          onNavigate={handleNavigate}
+          selectedModelId={selectedModelId}
+          onSelectModelId={setSelectedModelId}
         />
       </main>
 
@@ -109,8 +173,34 @@ export default function App() {
         onClose={() => setIsModalOpen(false)}
         onSelectArtifact={(item) => {
           setSelectedHotspot(item);
-          handleScrollTo(item.body.toLowerCase());
+          handleNavigate(item.body.toLowerCase());
         }}
+      />
+
+      {/* 6. Flight Permit Quiz Gate Modal */}
+      <QuizModal
+        isOpen={isQuizOpen}
+        onClose={() => setIsQuizOpen(false)}
+        isGameUnlocked={isGameUnlocked}
+        onUnlockGame={() => {
+          setIsGameUnlocked(true);
+          try {
+            localStorage.setItem('space_game_unlocked', 'true');
+          } catch (err) {
+            console.error(err);
+          }
+        }}
+        onLaunchGame={() => {
+          setIsQuizOpen(false);
+          setIsGameOpen(true);
+        }}
+      />
+
+      {/* 7. Retro-Futuristic 2D Space Flight Simulator */}
+      <SpaceGame
+        isOpen={isGameOpen}
+        onClose={() => setIsGameOpen(false)}
+        destination={activePlanet === 'mars' ? 'mars' : 'moon'}
       />
     </div>
   );

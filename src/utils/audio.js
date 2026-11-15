@@ -1,4 +1,4 @@
-// Web Audio API Synthesizer for Nothing OS minimal UI sounds & deep space ambiance
+// Web Audio API Synthesizer for Nothing OS minimal UI sounds & retro-futuristic arcade game
 // Zero external audio files required!
 
 class SpaceAudioSystem {
@@ -8,6 +8,7 @@ class SpaceAudioSystem {
     this.droneGain = null;
     this.droneOsc1 = null;
     this.droneOsc2 = null;
+    this.noiseBuffer = null;
   }
 
   init() {
@@ -15,6 +16,18 @@ class SpaceAudioSystem {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     this.ctx = new AudioContext();
+    this.generateNoiseBuffer();
+  }
+
+  // Pre-generate 1 second of white noise for explosions & thrusters
+  generateNoiseBuffer() {
+    if (!this.ctx) return;
+    const bufferSize = this.ctx.sampleRate;
+    this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = this.noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
   }
 
   toggleSound() {
@@ -152,6 +165,195 @@ class SpaceAudioSystem {
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.4);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // ========================================================
+  // SPACE GAME SYNTHETIC AUDIO (Zero external MP3 assets)
+  // ========================================================
+
+  // Twin Plasma Laser Blaster: Frequency exponential ramp from 880Hz down to 120Hz
+  playLaserShot() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.12);
+
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Asteroid & Debris Explosion Crunch: Filtered noise burst + sub bass thud
+  playExplosion(isMega = false) {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const duration = isMega ? 0.45 : 0.28;
+
+      // 1. Noise buffer crunch
+      if (this.noiseBuffer) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(isMega ? 350 : 650, now);
+        filter.Q.setValueAtTime(1.8, now);
+
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(isMega ? 0.35 : 0.25, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + duration);
+      }
+
+      // 2. Sub-bass shockwave thud
+      const subOsc = this.ctx.createOscillator();
+      const subGain = this.ctx.createGain();
+
+      subOsc.type = 'triangle';
+      subOsc.frequency.setValueAtTime(isMega ? 140 : 180, now);
+      subOsc.frequency.exponentialRampToValueAtTime(30, now + duration);
+
+      subGain.gain.setValueAtTime(isMega ? 0.4 : 0.25, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      subOsc.connect(subGain);
+      subGain.connect(this.ctx.destination);
+
+      subOsc.start(now);
+      subOsc.stop(now + duration);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Shield Collision Warning: Square wave alert & hull crack impact
+  playShieldHit() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+
+      // Two rapid alarm beeps
+      [320, 240].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + idx * 0.08 + 0.07);
+
+        gain.gain.setValueAtTime(0.22, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.07);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.07);
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Quiz Correct Answer Chime
+  playQuizSuccess() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      // Ascending C major arpeggio
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+
+        gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.18);
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Quiz Incorrect Answer Buzz
+  playQuizFail() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.setValueAtTime(110, now + 0.1);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.28);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Victory Fanfare when winning the game or unlocking
+  playVictoryFanfare() {
+    if (this.isMuted || !this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      // Majestic fanfare: C5 -> E5 -> G5 -> C6 -> E6
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+
+        const duration = idx === notes.length - 1 ? 0.6 : 0.18;
+        gain.gain.setValueAtTime(0.22, now + idx * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + duration);
+      });
     } catch (e) {
       // ignore
     }

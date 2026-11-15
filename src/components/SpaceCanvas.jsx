@@ -1,173 +1,217 @@
-import React, { useRef, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useRef, useEffect, useState, Suspense } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars, PerspectiveCamera } from '@react-three/drei';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Planet from './Planet';
 import { HOTSPOTS_DATA } from '../data/spaceData';
 
-gsap.registerPlugin(ScrollTrigger);
+// Dynamic Camera Controller that handles planet focus and orbital view
+function CameraManager({
+  selectedHotspot,
+  activePlanet,
+  selectedModelId,
+  controlsRef
+}) {
+  const { camera } = useThree();
 
-// 3D Scene container containing planets and GSAP scroll binding
+  useEffect(() => {
+    const duration = 1.35;
+    const ease = 'power2.inOut';
+
+    if (selectedHotspot) {
+      // Focus slightly closer on the active artifact
+      gsap.to(camera.position, {
+        x: 0,
+        y: 0,
+        z: 5.6,
+        duration,
+        ease
+      });
+
+      if (controlsRef.current) {
+        gsap.to(controlsRef.current.target, {
+          x: 0,
+          y: 0,
+          z: 0,
+          duration,
+          ease
+        });
+      }
+    } else {
+      // Global viewing distance
+      gsap.to(camera.position, {
+        x: 0,
+        y: 0,
+        z: 6.6,
+        duration: 1.5,
+        ease
+      });
+
+      if (controlsRef.current) {
+        const isModelsOrArchive = activePlanet === 'archive' || activePlanet === 'models';
+        const targetY = isModelsOrArchive && selectedModelId === 'all' ? 0.3 : 0;
+        gsap.to(controlsRef.current.target, {
+          x: 0,
+          y: targetY,
+          z: 0,
+          duration: 1.5,
+          ease
+        });
+      }
+    }
+  }, [selectedHotspot, activePlanet, selectedModelId, camera, controlsRef]);
+
+  return null;
+}
+
+// 3D Scene containing planets with smooth GSAP transitions and layout framing
 function SpaceScene({
   selectedHotspot,
   onSelectHotspot,
   onCloseHotspot,
   activePlanet,
-  setActivePlanet,
-  scrollContainerRef
+  selectedModelId = 'earth',
+  onSelectModelId
 }) {
   const earthGroup = useRef();
   const moonGroup = useRef();
   const marsGroup = useRef();
   const controlsRef = useRef();
 
+  const getPlanetX = (planet = activePlanet) => {
+    if (typeof window === 'undefined') return 0;
+    if (window.innerWidth < 1024) return 0;
+    // On Earth: shift Earth to the right to leave space for left text
+    if (planet === 'earth') return 1.15;
+    if (planet === 'archive' || planet === 'models') return 0.95;
+    // On Moon & Mars: slight right-of-center framing between Left-Bottom card & Right Sidebar
+    return -0.1;
+  };
+
+  const [planetX, setPlanetX] = useState(getPlanetX(activePlanet));
+
+  // Listen to active planet transitions - uniform animation across all models
   useEffect(() => {
-    // Ensure container exists
-    const container = scrollContainerRef.current;
-    if (!container || !earthGroup.current || !moonGroup.current || !marsGroup.current) return;
+    if (!earthGroup.current || !moonGroup.current || !marsGroup.current) return;
 
-    // Initial positions
-    // Earth starts centered
-    earthGroup.current.position.set(0, 0, 0);
-    earthGroup.current.scale.set(1, 1, 1);
+    const duration = 1.25;
+    const ease = 'power2.inOut';
+    const px = getPlanetX(activePlanet);
+    setPlanetX(px);
 
-    // Moon starts off-screen right & back
-    moonGroup.current.position.set(10, -2, -6);
-    moonGroup.current.scale.set(0.2, 0.2, 0.2);
+    if (activePlanet === 'earth') {
+      // Earth enters front & center-right
+      gsap.to(earthGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+      gsap.to(earthGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
 
-    // Mars starts off-screen right & farther back
-    marsGroup.current.position.set(12, 3, -10);
-    marsGroup.current.scale.set(0.1, 0.1, 0.1);
+      // Moon & Mars move far off-screen to the right
+      gsap.to(moonGroup.current.position, { x: 24, y: -2, z: -12, duration, ease });
+      gsap.to(moonGroup.current.scale, { x: 0.15, y: 0.15, z: 0.15, duration, ease });
 
-    // Create GSAP ScrollTrigger Master Timeline
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: container,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1.4, // Smooth lerping as requested
-          onUpdate: (self) => {
-            const p = self.progress;
-            if (p < 0.35) {
-              setActivePlanet('earth');
-            } else if (p < 0.72) {
-              setActivePlanet('moon');
-            } else {
-              setActivePlanet('mars');
-            }
-          }
-        }
-      });
+      gsap.to(marsGroup.current.position, { x: 32, y: 4, z: -16, duration, ease });
+      gsap.to(marsGroup.current.scale, { x: 0.1, y: 0.1, z: 0.1, duration, ease });
+    } else if (activePlanet === 'moon') {
+      // Earth slides far off-screen to the left
+      gsap.to(earthGroup.current.position, { x: -24, y: 2, z: -12, duration, ease });
+      gsap.to(earthGroup.current.scale, { x: 0.15, y: 0.15, z: 0.15, duration, ease });
 
-      // === PHASE 1: Earth moves off-screen, Moon glides into center ===
-      tl.to(
-        earthGroup.current.position,
-        {
-          x: -9,
-          y: 2,
-          z: -6,
-          ease: 'power1.inOut'
-        },
-        0
-      )
-        .to(
-          earthGroup.current.scale,
-          {
-            x: 0.25,
-            y: 0.25,
-            z: 0.25,
-            ease: 'power1.inOut'
-          },
-          0
-        )
-        .to(
-          moonGroup.current.position,
-          {
-            x: 0,
-            y: 0,
-            z: 0,
-            ease: 'power1.inOut'
-          },
-          0.1
-        )
-        .to(
-          moonGroup.current.scale,
-          {
-            x: 1,
-            y: 1,
-            z: 1,
-            ease: 'power1.inOut'
-          },
-          0.1
-        );
+      // Moon enters front & center
+      gsap.to(moonGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+      gsap.to(moonGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
 
-      // === PHASE 2: Moon holds in center, then scales out as Mars glides in ===
-      tl.to(
-        moonGroup.current.position,
-        {
-          x: -9,
-          y: -2,
-          z: -6,
-          ease: 'power1.inOut'
-        },
-        0.55
-      )
-        .to(
-          moonGroup.current.scale,
-          {
-            x: 0.25,
-            y: 0.25,
-            z: 0.25,
-            ease: 'power1.inOut'
-          },
-          0.55
-        )
-        .to(
-          marsGroup.current.position,
-          {
-            x: 0,
-            y: 0,
-            z: 0,
-            ease: 'power1.inOut'
-          },
-          0.6
-        )
-        .to(
-          marsGroup.current.scale,
-          {
-            x: 1,
-            y: 1,
-            z: 1,
-            ease: 'power1.inOut'
-          },
-          0.6
-        );
-    });
+      // Mars stays off-screen to the right
+      gsap.to(marsGroup.current.position, { x: 24, y: 3, z: -12, duration, ease });
+      gsap.to(marsGroup.current.scale, { x: 0.15, y: 0.15, z: 0.15, duration, ease });
+    } else if (activePlanet === 'mars') {
+      // Earth & Moon stay far off-screen to the left
+      gsap.to(earthGroup.current.position, { x: -32, y: 4, z: -16, duration, ease });
+      gsap.to(earthGroup.current.scale, { x: 0.1, y: 0.1, z: 0.1, duration, ease });
 
-    return () => ctx.revert();
-  }, [scrollContainerRef, setActivePlanet]);
+      gsap.to(moonGroup.current.position, { x: -24, y: -2, z: -12, duration, ease });
+      gsap.to(moonGroup.current.scale, { x: 0.15, y: 0.15, z: 0.15, duration, ease });
+
+      // Mars enters front & center
+      gsap.to(marsGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+      gsap.to(marsGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
+    } else if (activePlanet === 'models' || activePlanet === 'archive') {
+      if (selectedModelId === 'earth') {
+        // Earth featured front and center
+        gsap.to(earthGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+        gsap.to(earthGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
+
+        gsap.to(moonGroup.current.position, { x: -4.2, y: -0.6, z: -4.5, duration, ease });
+        gsap.to(moonGroup.current.scale, { x: 0.32, y: 0.32, z: 0.32, duration, ease });
+
+        gsap.to(marsGroup.current.position, { x: 4.8, y: 1.2, z: -5.0, duration, ease });
+        gsap.to(marsGroup.current.scale, { x: 0.28, y: 0.28, z: 0.28, duration, ease });
+      } else if (selectedModelId === 'moon') {
+        // Moon featured front and center
+        gsap.to(moonGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+        gsap.to(moonGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
+
+        gsap.to(earthGroup.current.position, { x: -4.2, y: -0.6, z: -4.5, duration, ease });
+        gsap.to(earthGroup.current.scale, { x: 0.32, y: 0.32, z: 0.32, duration, ease });
+
+        gsap.to(marsGroup.current.position, { x: 4.8, y: 1.2, z: -5.0, duration, ease });
+        gsap.to(marsGroup.current.scale, { x: 0.28, y: 0.28, z: 0.28, duration, ease });
+      } else if (selectedModelId === 'mars') {
+        // Mars featured front and center
+        gsap.to(marsGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+        gsap.to(marsGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
+
+        gsap.to(earthGroup.current.position, { x: -4.2, y: -0.6, z: -4.5, duration, ease });
+        gsap.to(earthGroup.current.scale, { x: 0.32, y: 0.32, z: 0.32, duration, ease });
+
+        gsap.to(moonGroup.current.position, { x: 4.8, y: 1.2, z: -5.0, duration, ease });
+        gsap.to(moonGroup.current.scale, { x: 0.28, y: 0.28, z: 0.28, duration, ease });
+      } else {
+        // Triple showcase lineup
+        gsap.to(earthGroup.current.position, { x: -3.8, y: 0.2, z: -2.0, duration, ease });
+        gsap.to(earthGroup.current.scale, { x: 0.55, y: 0.55, z: 0.55, duration, ease });
+
+        gsap.to(moonGroup.current.position, { x: 0, y: 0.4, z: -1.2, duration, ease });
+        gsap.to(moonGroup.current.scale, { x: 0.65, y: 0.65, z: 0.65, duration, ease });
+
+        gsap.to(marsGroup.current.position, { x: 3.8, y: 0.2, z: -2.0, duration, ease });
+        gsap.to(marsGroup.current.scale, { x: 0.55, y: 0.55, z: 0.55, duration, ease });
+      }
+    }
+
+    const handleResize = () => {
+      const newPx = getPlanetX(activePlanet);
+      setPlanetX(newPx);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activePlanet, selectedModelId]);
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 6.8]} fov={45} />
+      <PerspectiveCamera makeDefault position={[0, 0, 6.6]} fov={45} />
 
-      {/* OrbitControls with enableZoom={false} as specified */}
-      <OrbitControls
-        ref={controlsRef}
-        enableZoom={false}
-        enablePan={false}
-        rotateSpeed={0.65}
-        dampingFactor={0.06}
-        enableDamping
+      <CameraManager
+        selectedHotspot={selectedHotspot}
+        activePlanet={activePlanet}
+        selectedModelId={selectedModelId}
+        controlsRef={controlsRef}
       />
 
-      {/* Dynamic Dramatic Cinematic Space Lighting */}
-      <ambientLight intensity={0.25} />
-      {/* Sunlight */}
+      {/* OrbitControls: Interactive Drag-to-Rotate */}
+      <OrbitControls
+        ref={controlsRef}
+        target={[0, 0, 0]}
+        enableZoom={false}
+        enablePan={false}
+        rotateSpeed={0.85}
+        dampingFactor={0.06}
+        enableDamping
+        makeDefault
+      />
+
+      {/* Cinematic Space Lighting */}
+      <ambientLight intensity={0.28} />
       <directionalLight position={[6, 3, 5]} intensity={2.2} />
-      {/* Rim / Backlight for realistic planetary crescent atmosphere */}
       <directionalLight position={[-6, -2, -4]} intensity={0.4} color="#60a5fa" />
 
       {/* Starfield */}
@@ -182,18 +226,23 @@ function SpaceScene({
       />
 
       {/* Section 1: Earth */}
-      <group ref={earthGroup}>
+      <group ref={earthGroup} position={[planetX, 0, 0]}>
         <Planet
           modelPath="/earth.glb"
           scale={0.004}
-          rotationSpeed={0.0012}
+          rotationSpeed={0.001}
           isPaused={false}
           atmosphereColor="#3b82f6"
+          isActive={
+            activePlanet === 'earth' ||
+            ((activePlanet === 'models' || activePlanet === 'archive') &&
+              (selectedModelId === 'earth' || selectedModelId === 'all'))
+          }
         />
       </group>
 
-      {/* Section 2: Moon (with 3 interactive hotspots) */}
-      <group ref={moonGroup}>
+      {/* Section 2: Moon */}
+      <group ref={moonGroup} position={[24, -2, -12]} scale={[0.15, 0.15, 0.15]}>
         <Planet
           modelPath="/moon.glb"
           scale={0.004}
@@ -204,11 +253,16 @@ function SpaceScene({
           onSelectHotspot={onSelectHotspot}
           onCloseHotspot={onCloseHotspot}
           atmosphereColor="#e2e8f0"
+          isActive={
+            activePlanet === 'moon' ||
+            ((activePlanet === 'models' || activePlanet === 'archive') &&
+              (selectedModelId === 'moon' || selectedModelId === 'all'))
+          }
         />
       </group>
 
-      {/* Section 3: Mars (with 3 interactive hotspots) */}
-      <group ref={marsGroup}>
+      {/* Section 3: Mars */}
+      <group ref={marsGroup} position={[32, 4, -16]} scale={[0.1, 0.1, 0.1]}>
         <Planet
           modelPath="/mars.glb"
           scale={0.004}
@@ -219,6 +273,11 @@ function SpaceScene({
           onSelectHotspot={onSelectHotspot}
           onCloseHotspot={onCloseHotspot}
           atmosphereColor="#f97316"
+          isActive={
+            activePlanet === 'mars' ||
+            ((activePlanet === 'models' || activePlanet === 'archive') &&
+              (selectedModelId === 'mars' || selectedModelId === 'all'))
+          }
         />
       </group>
     </>
@@ -231,8 +290,8 @@ export default function SpaceCanvas({
   onSelectHotspot,
   onCloseHotspot,
   activePlanet,
-  setActivePlanet,
-  scrollContainerRef
+  selectedModelId = 'earth',
+  onSelectModelId
 }) {
   return (
     <div className="webgl-container">
@@ -253,8 +312,8 @@ export default function SpaceCanvas({
             onSelectHotspot={onSelectHotspot}
             onCloseHotspot={onCloseHotspot}
             activePlanet={activePlanet}
-            setActivePlanet={setActivePlanet}
-            scrollContainerRef={scrollContainerRef}
+            selectedModelId={selectedModelId}
+            onSelectModelId={onSelectModelId}
           />
         </Suspense>
       </Canvas>

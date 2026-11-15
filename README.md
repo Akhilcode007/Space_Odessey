@@ -1,4 +1,4 @@
-# The Future: Earth, Moon & Mars (Interactive Edition)
+# Space Odyssey: The Future — Earth, Moon & Mars (Interactive Edition)
 
 ### NASA Space Apps Challenge 2026 // Category: "Abandoned but Not Forgotten"
 

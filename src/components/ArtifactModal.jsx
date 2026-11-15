@@ -69,7 +69,11 @@ export default function ArtifactModal({ isOpen, onClose, onSelectArtifact }) {
                   : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
               }`}
             >
-              {tab === 'all' ? 'All Catalogued (6)' : tab}
+              {tab === 'all'
+                ? `All Catalogued (${allArtifacts.length})`
+                : tab === 'moon'
+                ? `Moon (${HOTSPOTS_DATA.moon.length})`
+                : `Mars & Deep Space (${HOTSPOTS_DATA.mars.length})`}
             </button>
           ))}
         </div>

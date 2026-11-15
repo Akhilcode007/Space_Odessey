@@ -1,6 +1,20 @@
 import React from 'react';
-import { CELESTIAL_BODIES, HOTSPOTS_DATA } from '../data/spaceData';
-import { ArrowDown, Compass, Shield, Award, Sparkles, ChevronRight, ExternalLink, RotateCcw } from 'lucide-react';
+import { CELESTIAL_BODIES, HOTSPOTS_DATA, CELESTIAL_MODELS_DATA } from '../data/spaceData';
+import {
+  MapPin,
+  ChevronRight,
+  Rocket,
+  Compass,
+  ArrowRight,
+  BookOpen,
+  Crosshair,
+  Shield,
+  Award,
+  RotateCcw,
+  Box,
+  Layers,
+  Sparkles
+} from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
 export default function Sections({
@@ -8,336 +22,535 @@ export default function Sections({
   selectedHotspot,
   onSelectHotspot,
   onOpenDirectory,
-  onScrollTo
+  onNavigate,
+  selectedModelId = 'earth',
+  onSelectModelId
 }) {
+  // Available artifacts for current planet strictly from NASA prompt document
+  const currentArtifacts =
+    activePlanet === 'moon'
+      ? HOTSPOTS_DATA.moon
+      : activePlanet === 'mars'
+      ? HOTSPOTS_DATA.mars
+      : [];
+
+  // Default to first artifact if none currently selected
+  const activeArtifact =
+    selectedHotspot || (currentArtifacts.length > 0 ? currentArtifacts[0] : null);
+
+  const currentBody = CELESTIAL_BODIES[activePlanet] || CELESTIAL_BODIES.earth;
+
+  // The active target label for the floating pill badge
+  const targetLabel =
+    activeArtifact?.targetName ||
+    activeArtifact?.shortLabel ||
+    activeArtifact?.title ||
+    (activePlanet === 'mars' ? 'Sojourner' : 'Apollo Lunar Modules');
+
+  // Official catalog items strictly from the NASA prompt document
+  const catalogList = currentArtifacts;
+
+  const allModelsMeta = {
+    id: 'all',
+    name: 'SOLAR SYSTEM TRIO',
+    tag: 'TRIPLE 3D SHOWCASE // 04',
+    format: '3x GLTF 2.0 Binary',
+    filesize: '20.2 MB TOTAL',
+    polygons: '85,800 Triangles',
+    textures: 'Combined 4K PBR Shaders',
+    diameter: 'Earth, Moon & Mars',
+    orbitSpeed: 'Interplanetary',
+    sitesTarget: 'earth'
+  };
+
+  const currentModelMeta =
+    selectedModelId === 'all'
+      ? allModelsMeta
+      : (CELESTIAL_MODELS_DATA &&
+          CELESTIAL_MODELS_DATA.find((m) => m.id === selectedModelId)) ||
+        (CELESTIAL_MODELS_DATA && CELESTIAL_MODELS_DATA[0]) ||
+        allModelsMeta;
+
   return (
-    <div className="scroll-container">
-      {/* =========================================
-          SECTION 1: THE ORIGIN (EARTH)
-         ========================================= */}
-      <section
-        id="section-earth"
-        className="min-h-screen flex flex-col justify-between p-6 sm:p-12 md:p-16 max-w-7xl mx-auto pt-28 sm:pt-36"
-      >
-        <div className="interactive-zone max-w-xl">
-          {/* Telemetry Tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-zinc-300 mb-6 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
-            <span>ORIGIN // 0.000 KM</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-none">
-            THE FUTURE: <br />
-            <span className="text-zinc-400 font-light">EARTH, MOON & MARS</span>
-          </h1>
-
-          <div className="glass-panel p-6 rounded-3xl border border-white/15 mb-6">
-            <h2 className="text-sm font-mono font-bold tracking-wider text-red-400 uppercase mb-2">
-              NASA Space Apps // "Abandoned but Not Forgotten"
-            </h2>
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed font-sans mb-4">
-              What popular culture dismisses as "space junk" is actually the archaeological
-              monuments of human courage. Every descent stage, robotic rover, and antenna left on
-              extraterrestrial ground represents a monumental triumph of engineering.
-            </p>
-            <div className="flex flex-wrap gap-2 text-xs font-mono text-zinc-400 pt-3 border-t border-white/10">
-              <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white">
-                NSSDCA VERIFIED
-              </span>
-              <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white">
-                3D INTERACTIVE EXPEDITION
-              </span>
+    <div className="relative z-10 w-full h-full pointer-events-none select-none">
+      {/* ========================================================
+          1. EARTH HERO SECTION (Clean Left Alignment)
+         ======================================================== */}
+      {activePlanet === 'earth' && (
+        <div className="fixed top-24 sm:top-28 left-6 sm:left-12 lg:left-16 bottom-8 z-30 pointer-events-none flex flex-col justify-between max-w-[460px] sm:max-w-[500px] lg:max-w-[520px] animate-in fade-in duration-300">
+          <div className="pointer-events-auto">
+            {/* Origin Telemetry Tag */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-zinc-300 mb-5 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+              <span>ORIGIN // 0.000 KM</span>
             </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                soundManager.playTransition();
-                onScrollTo('moon');
-              }}
-              className="liquid-metal-btn flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold text-white tracking-wider"
-            >
-              <span>DEPART FOR MOON</span>
-              <ArrowDown className="w-4 h-4 animate-bounce" />
-            </button>
-
-            <button
-              onClick={() => {
-                soundManager.playBlip(1200, 0.04);
-                onOpenDirectory();
-              }}
-              className="px-5 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-mono text-zinc-300 hover:text-white transition-all"
-            >
-              VIEW 6 RELICS ARCHIVE
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom Scroll Prompt */}
-        <div className="interactive-zone flex items-center justify-between text-xs font-mono text-zinc-500 py-6 border-t border-white/5">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-            <span>CLICK & DRAG TO SPIN CELESTIAL BODIES</span>
-          </div>
-          <div className="flex items-center gap-2 animate-bounce">
-            <span>SCROLL TO ADVANCE</span>
-            <ArrowDown className="w-3.5 h-3.5" />
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================
-          SECTION 2: THE HERITAGE (MOON)
-         ========================================= */}
-      <section
-        id="section-moon"
-        className="min-h-screen flex flex-col justify-center p-6 sm:p-12 md:p-16 max-w-7xl mx-auto"
-      >
-        <div className="interactive-zone max-w-lg">
-          {/* Telemetry Tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-zinc-300 mb-6 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-zinc-300 shadow-[0_0_8px_#ffffff]" />
-            <span>HERITAGE_02 // 384,400 KM</span>
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
-            LUNAR HERITAGE <br />
-            <span className="text-zinc-400 font-light">& HISTORIC BASES</span>
-          </h2>
-
-          <div className="glass-panel p-6 rounded-3xl border border-white/15 mb-6">
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed font-sans mb-4">
-              In the airless stillness of the lunar surface, 110+ artifacts remain frozen in time.
-              Without wind, rain, or volcanic turnover, the Apollo descent stages, lunar roving
-              vehicles, and Surveyor landers stand in pristine preservation.
-            </p>
-
-            <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 mb-4">
-              <span className="text-[11px] font-mono font-bold text-red-400 block mb-1">
-                INTERACTIVE 3D HOTSPOTS (CLICK PINS ON MOON):
+            {/* Main Title - Cleanly formatted on two unbroken lines */}
+            <h1 className="text-3xl sm:text-5xl lg:text-[3.25rem] font-bold tracking-tight text-white mb-5 leading-[1.08]">
+              THE FUTURE: <br />
+              <span className="text-zinc-400 font-light block mt-1">
+                EARTH, MOON & MARS
               </span>
-              <p className="text-xs text-zinc-400 font-sans">
-                Rotate the Moon model to locate the glowing pins. Each answers NASA's 5 mandated
-                questions: identity, rationale, achievements, location, and modern relevance.
+            </h1>
+
+            {/* Glass Narrative Box */}
+            <div
+              className="glass-panel p-5 sm:p-6 lg:p-7 rounded-3xl border border-white/15 mb-6 backdrop-blur-xl shadow-2xl"
+              style={{ background: 'rgba(10, 12, 18, 0.85)' }}
+            >
+              <h2 className="text-xs font-mono font-bold tracking-wider text-red-400 uppercase mb-2.5 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                <span>NASA SPACE APPS // "ABANDONED BUT NOT FORGOTTEN"</span>
+              </h2>
+              <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed font-sans mb-4">
+                What popular culture dismisses as "space junk" is actually the archaeological
+                monuments of human courage. Every descent stage, robotic rover, and antenna left on
+                extraterrestrial ground represents a monumental triumph of engineering.
               </p>
+              <div className="flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-mono text-zinc-400 pt-3 border-t border-white/10">
+                <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white font-medium">
+                  NSSDCA VERIFIED
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white font-medium">
+                  3D INTERACTIVE EXPEDITION
+                </span>
+              </div>
             </div>
 
-            {/* Quick Artifact Jump Pills */}
-            <div className="space-y-2">
-              {HOTSPOTS_DATA.moon.map((spot) => {
-                const isSelected = selectedHotspot?.id === spot.id;
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => {
+                  soundManager.playTransition();
+                  onNavigate('moon');
+                }}
+                className="liquid-metal-btn flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-mono font-bold text-white tracking-wider shadow-lg"
+              >
+                <span>DEPART FOR MOON</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => {
+                  soundManager.playTransition();
+                  onNavigate('models');
+                }}
+                className="px-5 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-mono text-zinc-300 hover:text-white transition-all backdrop-blur-md"
+              >
+                EXPLORE 3D MODELS
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Interaction Prompt */}
+          <div className="pointer-events-auto flex items-center justify-between text-xs font-mono text-zinc-500 pt-3 border-t border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+              <span>CLICK & DRAG TO SPIN CELESTIAL BODIES</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-zinc-400">
+              <span>PRESS [→] TO ADVANCE</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          2. MOON & MARS: LEFT-BOTTOM DETAIL CARD
+         ======================================================== */}
+      {(activePlanet === 'moon' || activePlanet === 'mars') && activeArtifact && (
+        <div className="fixed bottom-6 left-6 sm:bottom-8 sm:left-8 z-30 max-w-[420px] sm:max-w-[450px] w-[calc(100vw-3rem)] pointer-events-auto animate-in fade-in slide-in-from-bottom-6 duration-300">
+          <div
+            className="glass-panel-interactive rounded-3xl p-5 sm:p-6 border border-white/20 shadow-2xl relative overflow-hidden backdrop-blur-2xl"
+            style={{ background: 'rgba(10, 12, 18, 0.88)' }}
+          >
+            {/* Subtle Corner Glow Accent */}
+            <div
+              className="absolute -top-16 -right-16 w-36 h-36 rounded-full blur-3xl pointer-events-none opacity-25"
+              style={{
+                backgroundColor: activeArtifact?.color || '#38bdf8'
+              }}
+            />
+
+            <div>
+              {/* Top Row: Category Pill Badge & Date Tag */}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span
+                  className="px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border"
+                  style={{
+                    backgroundColor: `${activeArtifact.color || '#38bdf8'}15`,
+                    borderColor: `${activeArtifact.color || '#38bdf8'}50`,
+                    color: activeArtifact.color || '#38bdf8'
+                  }}
+                >
+                  {activeArtifact.badgeTag || 'CATALOGED SITE'}
+                </span>
+                <span className="font-mono text-[11px] text-zinc-400">
+                  {activeArtifact.date}
+                </span>
+              </div>
+
+              {/* Title & Landing Site */}
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-1.5 flex items-center gap-2">
+                {activeArtifact.title}
+              </h2>
+
+              <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-300 mb-3">
+                <MapPin
+                  className="w-3.5 h-3.5 shrink-0"
+                  style={{ color: activeArtifact.color || '#38bdf8' }}
+                />
+                <span className="truncate">{activeArtifact.site}</span>
+              </div>
+
+              {/* Summary Paragraph */}
+              <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed mb-4 line-clamp-3">
+                {activeArtifact.summary || activeArtifact.answers.what}
+              </p>
+
+              {/* 2-Column Telemetry Box */}
+              <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-black/60 border border-white/10 mb-4 font-mono">
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    COORDINATES
+                  </span>
+                  <span className="text-white text-xs font-semibold block truncate">
+                    {activeArtifact.coords}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    SPACE AGENCY
+                  </span>
+                  <span
+                    className="text-xs font-semibold block truncate"
+                    style={{ color: activeArtifact.color || '#38bdf8' }}
+                  >
+                    {activeArtifact.agency || activeArtifact.mission}
+                  </span>
+                </div>
+              </div>
+
+              {/* Primary Action Button */}
+              <button
+                onClick={() => {
+                  soundManager.playTargetLock();
+                  onOpenDirectory();
+                }}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-xs font-mono font-bold text-white shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mb-2.5"
+                style={{
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #1e40af 100%)',
+                  boxShadow: '0 0 25px rgba(14, 165, 233, 0.35)'
+                }}
+              >
+                <Rocket className="w-4 h-4" />
+                <span>COMMENCE EXPEDITION & VIEW REPORT</span>
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </button>
+
+              {/* Secondary Direct Access Button */}
+              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 pt-1">
+                <span className="flex items-center gap-1.5 text-zinc-400">
+                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>DIRECT 3D SURFACE ACCESS</span>
+                </span>
+                <span className="text-zinc-500">PRESS [ESC] TO DESELECT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          3. MOON & MARS: RIGHT SIDEBAR (Official NASA Prompt Sites)
+         ======================================================== */}
+      {(activePlanet === 'moon' || activePlanet === 'mars') && (
+        <aside className="fixed top-20 right-6 sm:right-8 z-30 w-72 sm:w-84 max-w-[calc(100vw-3rem)] pointer-events-auto flex flex-col gap-3 animate-in fade-in slide-in-from-right-6 duration-300">
+          {/* Floating Target Pill Badge */}
+          <div className="flex justify-end mb-1">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#0c121c]/90 border border-white/20 backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+              {/* Cyan Target Reticle Icon */}
+              <div className="relative flex items-center justify-center w-5 h-5 text-cyan-400 shrink-0">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4"
+                >
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M12 2v3" />
+                  <path d="M12 19v3" />
+                  <path d="M2 12h3" />
+                  <path d="M19 12h3" />
+                  <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+                </svg>
+              </div>
+              <span className="font-mono text-xs tracking-wider text-cyan-200 uppercase">
+                TARGET:{' '}
+                <span className="font-bold text-white tracking-wider">
+                  {targetLabel}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* Catalogue Header Row */}
+          <div className="flex items-center justify-between text-xs font-mono tracking-wider px-1 text-cyan-400 font-semibold mt-1">
+            <span className="tracking-widest uppercase">
+              {activePlanet === 'mars' ? 'MARS CATALOGED SITES' : 'LUNAR CATALOGED SITES'}
+            </span>
+            <span className="tracking-widest">
+              {catalogList.length} CATALOGED
+            </span>
+          </div>
+
+          {/* Vertical Stack of Catalogue Site Cards */}
+          <div className="flex flex-col gap-2.5 overflow-y-auto max-h-[calc(100vh-14rem)] pr-1 select-none">
+            {catalogList.map((spot) => {
+              const isSelected = activeArtifact?.id === spot.id;
+              return (
+                <button
+                  key={spot.id}
+                  onClick={() => {
+                    soundManager.playTargetLock();
+                    onSelectHotspot(spot);
+                  }}
+                  className={`w-full text-left p-4 rounded-2xl transition-all duration-300 flex items-center justify-between group border backdrop-blur-xl ${
+                    isSelected
+                      ? 'bg-[#121824]/95 border-white/25 shadow-xl'
+                      : 'bg-[#0b0f17]/80 hover:bg-[#121824]/90 border-white/10 hover:border-white/20'
+                  }`}
+                  style={{
+                    boxShadow: isSelected
+                      ? '0 0 25px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.03)'
+                      : undefined
+                  }}
+                >
+                  <div className="min-w-0 pr-3">
+                    <h4 className="text-sm font-bold font-sans tracking-tight text-white group-hover:text-cyan-200 transition-colors leading-snug">
+                      {spot.title}
+                    </h4>
+                    <p className="text-xs font-mono text-zinc-400 truncate mt-1">
+                      {spot.site}
+                    </p>
+                  </div>
+
+                  {/* Red Chevron when active, dim when inactive */}
+                  <ChevronRight
+                    className={`w-4 h-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 ${
+                      isSelected ? 'text-[#eb2e2e]' : 'text-zinc-600 group-hover:text-zinc-400'
+                    }`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom Link to 3D Models Lab */}
+          <button
+            onClick={() => {
+              soundManager.playTransition();
+              onNavigate('models');
+            }}
+            className="liquid-metal-btn flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-mono text-zinc-300 hover:text-white border border-white/15 mt-1"
+          >
+            <Box className="w-3.5 h-3.5 text-zinc-400" />
+            <span>EXPLORE 3D MODELS LAB</span>
+          </button>
+        </aside>
+      )}
+
+      {/* ========================================================
+          4. 3D MODELS SECTION: INTERACTIVE CELESTIAL REPOSITORY
+         ======================================================== */}
+      {(activePlanet === 'models' || activePlanet === 'archive') && (
+        <div className="fixed inset-0 z-30 pointer-events-none flex flex-col justify-between p-4 sm:p-8 lg:p-12 pt-20 sm:pt-24 pb-14 animate-in fade-in duration-300">
+          {/* Top Bar: Section Badge & Model Selector Tabs */}
+          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/70 border border-white/15 text-[11px] font-mono tracking-widest text-zinc-300 backdrop-blur-xl shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" />
+                <span>SECTION 04 // 3D MODELS LAB</span>
+              </div>
+              <span className="hidden md:inline-block font-mono text-xs text-zinc-400 tracking-wider">
+                GLTF 2.0 DIGITAL TWINS
+              </span>
+            </div>
+
+            {/* Model Selector Tabs */}
+            <div className="flex items-center gap-1.5 p-1 rounded-full bg-black/80 border border-white/15 backdrop-blur-xl shadow-2xl">
+              {[
+                { id: 'earth', label: '01. EARTH' },
+                { id: 'moon', label: '02. MOON' },
+                { id: 'mars', label: '03. MARS' },
+                { id: 'all', label: '04. TRIPLE VIEW' }
+              ].map((tab) => {
+                const isActive = selectedModelId === tab.id;
                 return (
                   <button
-                    key={spot.id}
+                    key={tab.id}
                     onClick={() => {
-                      soundManager.playTargetLock();
-                      onSelectHotspot(spot);
+                      soundManager.playBlip(950, 0.04);
+                      onSelectModelId?.(tab.id);
                     }}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl text-left font-mono text-xs transition-all ${
-                      isSelected
-                        ? 'bg-red-600/30 border border-red-500/60 text-white'
-                        : 'bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300'
+                    className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-mono font-medium tracking-wider transition-all duration-300 ${
+                      isActive
+                        ? 'bg-white text-black font-bold shadow-md scale-105'
+                        : 'text-zinc-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className="font-bold text-white">{spot.title}</span>
-                    </div>
-                    <span className="text-[10px] text-zinc-400 font-mono">[{spot.codename}]</span>
+                    {tab.label}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              soundManager.playTransition();
-              onScrollTo('mars');
-            }}
-            className="liquid-metal-btn flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold text-white tracking-wider"
-          >
-            <span>TRANSIT TO MARS</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </section>
-
-      {/* =========================================
-          SECTION 3: THE FRONTIER (MARS)
-         ========================================= */}
-      <section
-        id="section-mars"
-        className="min-h-screen flex flex-col justify-center p-6 sm:p-12 md:p-16 max-w-7xl mx-auto"
-      >
-        <div className="interactive-zone max-w-lg">
-          {/* Telemetry Tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-zinc-300 mb-6 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]" />
-            <span>FRONTIER_03 // 225,000,000 KM</span>
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
-            MARTIAN GUARDIANS <br />
-            <span className="text-zinc-400 font-light">& ROBOTIC LEGENDS</span>
-          </h2>
-
-          <div className="glass-panel p-6 rounded-3xl border border-white/15 mb-6">
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed font-sans mb-4">
-              Mars is a vast museum of human robotics. Surviving dust storms, freezing nights, and
-              rocky terrain, these probes became humanity’s surrogates—expanding our knowledge of
-              water, habitability, and flight across interplanetary distances.
-            </p>
-
-            <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 mb-4">
-              <span className="text-[11px] font-mono font-bold text-red-400 block mb-1">
-                DISCOVER MARTIAN RELICS (CLICK PINS ON MARS):
-              </span>
-              <p className="text-xs text-zinc-400 font-sans">
-                Drag to spin the red planet. Click any glowing marker to explore its story card with
-                the five core preservation dimensions.
-              </p>
-            </div>
-
-            {/* Quick Artifact Jump Pills */}
-            <div className="space-y-2">
-              {HOTSPOTS_DATA.mars.map((spot) => {
-                const isSelected = selectedHotspot?.id === spot.id;
-                return (
-                  <button
-                    key={spot.id}
-                    onClick={() => {
-                      soundManager.playTargetLock();
-                      onSelectHotspot(spot);
-                    }}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl text-left font-mono text-xs transition-all ${
-                      isSelected
-                        ? 'bg-red-600/30 border border-red-500/60 text-white'
-                        : 'bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className="font-bold text-white">{spot.title}</span>
-                    </div>
-                    <span className="text-[10px] text-zinc-400 font-mono">[{spot.codename}]</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              soundManager.playTransition();
-              onScrollTo('archive');
-            }}
-            className="liquid-metal-btn flex items-center gap-2 px-6 py-3 rounded-full text-xs font-mono font-bold text-white tracking-wider"
-          >
-            <span>VIEW PRESERVATION MANIFESTO</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </section>
-
-      {/* =========================================
-          SECTION 4: PRESERVATION MANIFESTO & DATA
-         ========================================= */}
-      <section
-        id="section-archive"
-        className="min-h-screen flex flex-col justify-center p-6 sm:p-12 md:p-16 max-w-7xl mx-auto py-24"
-      >
-        <div className="interactive-zone max-w-3xl mx-auto w-full">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono tracking-widest text-zinc-300 mb-4 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-              <span>SECTION 04 // THE MANIFESTO</span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
-              HERITAGE FOR FUTURE GENERATIONS
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-base font-sans max-w-xl mx-auto">
-              Under the Artemis Accords and international space archaeology guidelines, humanity is
-              establishing protected heritage zones around historic landing sites to prevent rocket
-              exhaust erosion and vandalism.
-            </p>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="glass-panel p-6 rounded-3xl border border-white/15">
-              <div className="flex items-center gap-2.5 font-mono text-sm font-bold text-white mb-3">
-                <Shield className="w-4 h-4 text-red-500" />
-                <span>ARTEMIS ACCORDS §5.4</span>
-              </div>
-              <p className="text-xs text-zinc-300 leading-relaxed font-sans">
-                Signatory nations commit to preserving historic landing sites, robotic hardware, and
-                celestial artifacts from damaging disturbances, recognizing them as the shared
-                heritage of all humankind.
-              </p>
-            </div>
-
-            <div className="glass-panel p-6 rounded-3xl border border-white/15">
-              <div className="flex items-center gap-2.5 font-mono text-sm font-bold text-white mb-3">
-                <Award className="w-4 h-4 text-blue-400" />
-                <span>NSSDCA SCIENTIFIC ACCURACY</span>
-              </div>
-              <p className="text-xs text-zinc-300 leading-relaxed font-sans">
-                100% of dates, coordinates, hardware dimensions, and mission statuses in this
-                application are cross-referenced with NASA's Space Science Data Coordinated Archive.
-              </p>
-            </div>
-          </div>
-
-          {/* Compliance & AI Declaration Box */}
-          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/20 mb-8 bg-zinc-950/70">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-zinc-400 mb-4 border-b border-white/10 pb-2">
-              NASA Space Apps Challenge 2026 // Submission Compliance
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono text-zinc-300">
-              <div>
-                <span className="text-zinc-500 block text-[10px]">CHALLENGE CATEGORY</span>
-                <span className="text-white font-bold">Abandoned but Not Forgotten</span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-[10px]">3D ASSETS ATTRIBUTION</span>
-                <span className="text-white font-bold">NASA Solar System Treks (GLTF)</span>
-              </div>
-              <div>
-                <span className="text-zinc-500 block text-[10px]">DEVELOPMENT PLATFORM</span>
-                <span className="text-white font-bold">Google Antigravity AI Engine</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Row */}
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <button
-              onClick={() => {
-                soundManager.playTargetLock();
-                onOpenDirectory();
-              }}
-              className="liquid-metal-btn flex items-center gap-2 px-8 py-3.5 rounded-full text-xs font-mono font-bold text-white tracking-wider"
+          {/* Left Floating Interactive Inspector Box */}
+          <div className="pointer-events-auto max-w-md lg:max-w-lg w-full flex flex-col gap-3 my-auto">
+            <div
+              className="glass-panel p-5 sm:p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden"
+              style={{ background: 'rgba(10, 12, 18, 0.88)' }}
             >
-              <span>EXPLORE ALL 6 MONUMENTS</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              {/* Corner Glow */}
+              <div
+                className="absolute -top-12 -right-12 w-36 h-36 rounded-full blur-3xl pointer-events-none opacity-25"
+                style={{
+                  backgroundColor:
+                    selectedModelId === 'mars'
+                      ? '#f97316'
+                      : selectedModelId === 'moon'
+                      ? '#e2e8f0'
+                      : '#3b82f6'
+                }}
+              />
 
+              {/* Model Tag & File Size Badge */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-widest text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 uppercase">
+                  {currentModelMeta?.tag || 'CELESTIAL REPOSITORY'}
+                </span>
+                <span className="font-mono text-[11px] text-zinc-400">
+                  {currentModelMeta?.filesize || '12.9 MB'} // {currentModelMeta?.format || 'GLTF 2.0'}
+                </span>
+              </div>
+
+              {/* Model Name */}
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+                {currentModelMeta?.name || 'CELESTIAL DIGITAL TWIN'}
+              </h2>
+
+              {/* Description */}
+              <p className="text-zinc-300 text-xs sm:text-sm font-sans leading-relaxed mb-4">
+                Interactive real-time 3D model rendered from NASA orbital telemetry. Click and drag
+                anywhere on the screen or on the celestial body to rotate 360° with dynamic inertia and
+                subtle cursor parallax.
+              </p>
+
+              {/* Technical Specifications Grid */}
+              <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-black/60 border border-white/10 mb-4 font-mono text-xs">
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    POLYGONS & MESH
+                  </span>
+                  <span className="text-white font-semibold block truncate">
+                    {currentModelMeta?.polygons || '32,400 Triangles'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    TEXTURE RESOLUTION
+                  </span>
+                  <span className="text-white font-semibold block truncate">
+                    {currentModelMeta?.textures || '4K PBR Materials'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    DIAMETER
+                  </span>
+                  <span className="text-white font-semibold block truncate">
+                    {currentModelMeta?.diameter || '12,742 KM'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-zinc-500 block text-[9px] uppercase tracking-wider">
+                    ORBITAL SPEED
+                  </span>
+                  <span className="text-cyan-400 font-semibold block truncate">
+                    {currentModelMeta?.orbitSpeed || '107,200 KM/H'}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3D Capabilities Pill Row */}
+              <div className="flex flex-wrap gap-1.5 mb-4 text-[10px] font-mono text-zinc-400">
+                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300">
+                  ✦ 360° ORBIT DRAG
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300">
+                  ✦ PARALLAX TILT
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300">
+                  ✦ ATMOSPHERIC RIM
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-zinc-300">
+                  ✦ 13 RELIC SITES
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                {selectedModelId !== 'all' && (
+                  <button
+                    onClick={() => {
+                      soundManager.playTransition();
+                      onNavigate(currentModelMeta?.sitesTarget || 'moon');
+                    }}
+                    className="w-full sm:flex-1 liquid-metal-btn flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-mono font-bold text-white tracking-wider shadow-lg"
+                  >
+                    <span>EXPLORE {selectedModelId.toUpperCase()} SITES</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    soundManager.playTargetLock();
+                    onOpenDirectory();
+                  }}
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 text-xs font-mono text-zinc-200 hover:text-white transition-all backdrop-blur-md"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>VIEW 13 RELICS</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Telemetry Prompts */}
+          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex items-center justify-between text-xs font-mono text-zinc-500 pt-2 border-t border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span>CLICK & DRAG TO SPIN 3D MESH 360° // CURSOR PARALLAX ACTIVE</span>
+            </div>
             <button
               onClick={() => {
                 soundManager.playBlip(700, 0.05);
-                onScrollTo('earth');
+                onNavigate('earth');
               }}
-              className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/15 text-xs font-mono text-zinc-300 hover:text-white transition-all"
+              className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>RETURN TO EARTH (ORIGIN)</span>
+              <span>RETURN TO ORIGIN (EARTH)</span>
             </button>
           </div>
         </div>
-      </section>
+      )}
     </div>
   );
 }
