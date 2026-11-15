@@ -16,6 +16,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { soundManager } from '../utils/audio';
+import GallerySection from './GallerySection';
 
 export default function Sections({
   activePlanet,
@@ -823,6 +824,17 @@ export default function Sections({
             </button>
           </div>
         </div>
+      )}
+
+      {/* ========================================================
+          5. GALLERY SECTION: PRISM COVERFLOW CAROUSEL
+         ======================================================== */}
+      {activePlanet === 'gallery' && (
+        <GallerySection
+          onNavigate={onNavigate}
+          onSelectModelId={onSelectModelId}
+          onOpenDirectory={onOpenDirectory}
+        />
       )}
     </div>
   );

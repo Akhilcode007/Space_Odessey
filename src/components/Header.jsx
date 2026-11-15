@@ -35,7 +35,8 @@ export default function Header({
     { id: 'earth', label: '01. EARTH' },
     { id: 'moon', label: '02. MOON' },
     { id: 'mars', label: '03. MARS' },
-    { id: 'models', label: '04. 3D MODELS' }
+    { id: 'models', label: '04. 3D MODELS' },
+    { id: 'gallery', label: '05. GALLERY' }
   ];
 
   return (
@@ -95,7 +96,7 @@ export default function Header({
               title="Pass Flight Permit Examination to Unlock Space Flight Game"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span>05. UNLOCK GAME</span>
+              <span>06. UNLOCK GAME</span>
             </button>
           ) : (
             <button
@@ -107,7 +108,7 @@ export default function Header({
               title="Launch Retro-Futuristic 2D Space Flight Simulator"
             >
               <Rocket className="w-3.5 h-3.5 animate-bounce" />
-              <span>05. PLAY GAME</span>
+              <span>06. PLAY GAME</span>
             </button>
           )}
         </nav>

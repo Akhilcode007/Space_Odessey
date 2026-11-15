@@ -321,6 +321,25 @@ function SpaceScene({
         gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       }
+    } else if (activePlanet === 'gallery') {
+      // Gallery section: place planetary bodies in deep background so the Prism 3D Coverflow shines against starfield
+      gsap.to(earthGroup.current.position, { x: -30, y: 0, z: -25, duration, ease });
+      gsap.to(earthGroup.current.scale, { x: 0.05, y: 0.05, z: 0.05, duration, ease });
+
+      gsap.to(moonGroup.current.position, { x: 0, y: -25, z: -30, duration, ease });
+      gsap.to(moonGroup.current.scale, { x: 0.05, y: 0.05, z: 0.05, duration, ease });
+
+      gsap.to(marsGroup.current.position, { x: 30, y: 0, z: -25, duration, ease });
+      gsap.to(marsGroup.current.scale, { x: 0.05, y: 0.05, z: 0.05, duration, ease });
+
+      gsap.to(apolloGroup.current.position, { x: 0, y: -30, z: -30, duration, ease });
+      gsap.to(apolloGroup.current.scale, { x: 0.001, y: 0.001, z: 0.001, duration, ease });
+
+      gsap.to(pioneerGroup.current.position, { x: 0, y: -30, z: -30, duration, ease });
+      gsap.to(pioneerGroup.current.scale, { x: 0.001, y: 0.001, z: 0.001, duration, ease });
+
+      gsap.to(lrvGroup.current.position, { x: 0, y: -30, z: -30, duration, ease });
+      gsap.to(lrvGroup.current.scale, { x: 0.001, y: 0.001, z: 0.001, duration, ease });
     }
 
     const handleResize = () => {
@@ -349,6 +368,7 @@ function SpaceScene({
         target={[0, 0, 0]}
         enableZoom={false}
         enablePan={false}
+        enableRotate={activePlanet !== 'gallery'}
         rotateSpeed={0.85}
         dampingFactor={0.06}
         enableDamping

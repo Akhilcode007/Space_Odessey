@@ -10,7 +10,7 @@ import ChatbotLauncher from './components/ChatbotLauncher';
 import { soundManager } from './utils/audio';
 import { HOTSPOTS_DATA } from './data/spaceData';
 
-const SECTIONS = ['earth', 'moon', 'mars', 'models'];
+const SECTIONS = ['earth', 'moon', 'mars', 'models', 'gallery'];
 
 export default function App() {
   const [activePlanet, setActivePlanet] = useState('earth');
@@ -31,10 +31,11 @@ export default function App() {
   // Calculate HUD progress from active section
   const progressMap = {
     earth: 0.05,
-    moon: 0.42,
-    mars: 0.75,
-    models: 1.0,
-    archive: 1.0
+    moon: 0.28,
+    mars: 0.52,
+    models: 0.76,
+    gallery: 1.0,
+    archive: 0.76
   };
   const scrollProgress = progressMap[activePlanet] || 0.05;
 
