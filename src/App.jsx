@@ -125,6 +125,46 @@ export default function App() {
     return () => window.removeEventListener('wheel', handleWheel);
   }, [activePlanet, selectedHotspot, isModalOpen, isQuizOpen, isGameOpen]);
 
+  // Mobile / Tablet 2-finger swipe navigation (keeps 1-finger reserved for 3D OrbitControls)
+  useEffect(() => {
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      }
+    };
+
+    const handleTouchEnd = (e) => {
+      if (isModalOpen || isQuizOpen || isGameOpen) return;
+      if (touchStartX === 0) return;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+        if (deltaX < 0) {
+          handleNextSection();
+        } else {
+          handlePrevSection();
+        }
+      }
+      touchStartX = 0;
+      touchStartY = 0;
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [activePlanet, isModalOpen, isQuizOpen, isGameOpen]);
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#08080a] text-zinc-100 selection:bg-white/20 selection:text-white">
       {/* Nothing OS Subtle Dot Grid Background */}

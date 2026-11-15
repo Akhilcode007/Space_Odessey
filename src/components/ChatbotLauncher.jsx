@@ -30,14 +30,14 @@ export default function ChatbotLauncher() {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 select-none"
+      className="fixed bottom-3.5 right-3.5 sm:bottom-6 sm:right-6 z-50 select-none"
     >
       {/* ========================================================
           Floating Glassmorphic Chat Window
          ======================================================== */}
       {isOpen && (
         <div
-          className="fixed bottom-24 right-4 sm:right-6 w-[380px] sm:w-[420px] h-[580px] max-w-[94vw] max-h-[78vh] flex flex-col rounded-3xl border border-cyan-400/35 backdrop-blur-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-300 z-50"
+          className="fixed bottom-18 sm:bottom-24 right-2 sm:right-6 w-[calc(100vw-1rem)] sm:w-[420px] max-w-[420px] h-[560px] max-h-[76vh] flex flex-col rounded-3xl border border-cyan-400/35 backdrop-blur-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-300 z-50"
           style={{ background: 'rgba(10, 14, 22, 0.96)' }}
         >
           {/* Header Bar */}

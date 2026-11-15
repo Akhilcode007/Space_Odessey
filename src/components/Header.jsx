@@ -39,26 +39,26 @@ export default function Header({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 p-4 sm:p-6 pointer-events-none">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-40 p-2.5 sm:p-6 pointer-events-none">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         {/* Left: Nothing OS Identity & NASA Challenge Tag */}
-        <div className="pointer-events-auto flex items-center gap-3.5 glass-panel px-4 py-2.5 rounded-full border border-white/15">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-600 shadow-red-beacon animate-pulse" />
-            <span className="font-mono text-xs font-bold tracking-widest text-white">
+        <div className="pointer-events-auto flex items-center gap-2 sm:gap-3.5 glass-panel px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-full border border-white/15">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-red-600 shadow-red-beacon animate-pulse" />
+            <span className="font-mono text-[11px] sm:text-xs font-bold tracking-widest text-white whitespace-nowrap">
               SPACE ODYSSEY
             </span>
           </div>
-          <span className="text-zinc-600">/</span>
-          <span className="hidden sm:inline-block font-mono text-[11px] text-zinc-400 tracking-wider">
+          <span className="text-zinc-600 hidden xs:inline">/</span>
+          <span className="hidden md:inline-block font-mono text-[11px] text-zinc-400 tracking-wider">
             ABANDONED BUT NOT FORGOTTEN
           </span>
-          <span className="hidden md:inline-block px-2 py-0.5 rounded-full text-[9px] font-mono bg-white/5 border border-white/10 text-zinc-300">
+          <span className="hidden lg:inline-block px-2 py-0.5 rounded-full text-[9px] font-mono bg-white/5 border border-white/10 text-zinc-300">
             {utcTime}
           </span>
         </div>
 
-        {/* Center: Monochromatic Planet Switcher Nav with Space Flight Game Action */}
+        {/* Center: Monochromatic Planet Switcher Nav for Desktop (>= lg) */}
         <nav className="pointer-events-auto hidden lg:flex items-center gap-1.5 glass-panel px-2.5 py-1.5 rounded-full border border-white/15">
           {navItems.map((item) => {
             const isActive =
@@ -113,8 +113,8 @@ export default function Header({
         </nav>
 
         {/* Right: Audio Synthesizer Toggle & Directory Button */}
-        <div className="pointer-events-auto flex items-center gap-2">
-          {/* Mobile Game Action Trigger */}
+        <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+          {/* Mobile/Tablet Game Action Trigger */}
           <button
             onClick={() => {
               if (isGameUnlocked) {
@@ -125,7 +125,7 @@ export default function Header({
                 onOpenQuiz();
               }
             }}
-            className={`lg:hidden flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono border transition-all ${
+            className={`lg:hidden flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-mono border transition-all ${
               isGameUnlocked
                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
                 : 'glass-panel text-zinc-300 border-white/15'
@@ -151,7 +151,7 @@ export default function Header({
               soundManager.playBlip(1100, 0.04);
               onOpenDirectory();
             }}
-            className="liquid-metal-btn flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-mono text-zinc-200"
+            className="liquid-metal-btn flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-mono text-zinc-200"
             title="Open Complete Artifact Directory"
           >
             <BookOpen className="w-3.5 h-3.5 text-zinc-300" />
@@ -164,7 +164,7 @@ export default function Header({
           {/* Sound Synthesizer Toggle */}
           <button
             onClick={handleToggleSound}
-            className={`p-2 rounded-full border transition-all duration-300 ${
+            className={`p-1.5 sm:p-2 rounded-full border transition-all duration-300 ${
               isAudioActive
                 ? 'bg-white text-black border-white shadow-liquid-glow'
                 : 'glass-panel text-zinc-400 hover:text-white border-white/15'
@@ -173,12 +173,40 @@ export default function Header({
             aria-label="Toggle Audio"
           >
             {isAudioActive ? (
-              <Volume2 className="w-4 h-4 animate-pulse" />
+              <Volume2 className="w-3.5 sm:w-4 h-3.5 sm:h-4 animate-pulse" />
             ) : (
-              <VolumeX className="w-4 h-4" />
+              <VolumeX className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
             )}
           </button>
         </div>
+      </div>
+
+      {/* Center: Monochromatic Planet Switcher Nav for Mobile & Tablet (< lg) */}
+      <div className="lg:hidden flex items-center justify-center w-full mt-2 sm:mt-2.5 pointer-events-auto">
+        <nav className="flex items-center gap-1 glass-panel p-1 rounded-full border border-white/15 shadow-xl max-w-full overflow-x-auto no-scrollbar">
+          {navItems.map((item) => {
+            const isActive =
+              activePlanet === item.id ||
+              (item.id === 'models' && activePlanet === 'archive');
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  soundManager.playBlip(900, 0.04);
+                  onNavigate(item.id);
+                }}
+                className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-mono tracking-wider whitespace-nowrap transition-all duration-300 ${
+                  isActive
+                    ? 'bg-white text-black font-bold shadow-sm'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="sm:hidden">{item.label.replace(/^\d+\.\s*/, '')}</span>
+                <span className="hidden sm:inline">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </header>
   );

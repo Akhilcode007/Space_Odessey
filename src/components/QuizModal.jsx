@@ -147,11 +147,11 @@ export default function QuizModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-2xl animate-in fade-in duration-200 select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-2xl animate-in fade-in duration-200 select-none"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl flex flex-col rounded-3xl glass-panel-interactive border border-white/20 p-6 sm:p-8 overflow-hidden shadow-2xl relative"
+        className="w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl glass-panel-interactive border border-white/20 p-4 sm:p-8 overflow-y-auto no-scrollbar shadow-2xl relative"
         style={{ background: 'rgba(10, 12, 18, 0.96)' }}
         onClick={(e) => e.stopPropagation()}
       >

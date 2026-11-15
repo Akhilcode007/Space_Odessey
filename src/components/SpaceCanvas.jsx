@@ -19,12 +19,20 @@ function CameraManager({
     const duration = 1.35;
     const ease = 'power2.inOut';
 
+    // Calculate responsive camera z based on viewport aspect ratio
+    const aspect = typeof window !== 'undefined' ? window.innerWidth / Math.max(1, window.innerHeight) : 1.77;
+    // Portrait phone (< 0.65): zoom out to ~8.8 so planets and spacecraft don't touch screen edges
+    // Tablet portrait (< 1.0): ~7.6
+    // Desktop / landscape (>= 1.0): 6.6
+    const baseZ = aspect < 0.65 ? 8.8 : aspect < 1.0 ? 7.6 : 6.6;
+    const focusZ = aspect < 0.65 ? 7.2 : aspect < 1.0 ? 6.2 : 5.6;
+
     if (selectedHotspot) {
       // Focus slightly closer on the active artifact
       gsap.to(camera.position, {
         x: 0,
         y: 0,
-        z: 5.6,
+        z: focusZ,
         duration,
         ease
       });
@@ -43,7 +51,7 @@ function CameraManager({
       gsap.to(camera.position, {
         x: 0,
         y: 0,
-        z: 6.6,
+        z: baseZ,
         duration: 1.5,
         ease
       });

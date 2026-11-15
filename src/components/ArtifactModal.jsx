@@ -19,25 +19,25 @@ export default function ArtifactModal({ isOpen, onClose, onSelectArtifact }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-2xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-2xl animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl max-h-[88vh] flex flex-col rounded-3xl glass-panel-interactive border border-white/20 p-6 sm:p-8 overflow-hidden shadow-2xl"
+        className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl glass-panel-interactive border border-white/20 p-4 sm:p-8 overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{ background: 'rgba(12, 12, 16, 0.95)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/10">
+        <div className="flex items-center justify-between pb-3 sm:pb-5 border-b border-white/10">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[11px] text-red-500 tracking-widest uppercase mb-1">
+            <div className="flex items-center gap-2 font-mono text-[10px] sm:text-[11px] text-red-500 tracking-widest uppercase mb-1">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
               <span>NASA Celestial Monuments Index</span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Abandoned but Not Forgotten Archive
             </h2>
-            <p className="text-xs text-zinc-400 font-mono mt-0.5">
+            <p className="text-[11px] sm:text-xs text-zinc-400 font-mono mt-0.5">
               Reframing space exploration hardware as scientific heritage
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function ArtifactModal({ isOpen, onClose, onSelectArtifact }) {
               soundManager.playBlip(600, 0.04);
               onClose();
             }}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white transition-colors border border-white/10"
+            className="p-1.5 sm:p-2 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white transition-colors border border-white/10"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -55,7 +55,7 @@ export default function ArtifactModal({ isOpen, onClose, onSelectArtifact }) {
         </div>
 
         {/* Tab Filters */}
-        <div className="flex items-center gap-2 py-4 border-b border-white/5">
+        <div className="flex items-center gap-1.5 sm:gap-2 py-3 sm:py-4 border-b border-white/5 overflow-x-auto no-scrollbar whitespace-nowrap">
           {['all', 'moon', 'mars'].map((tab) => (
             <button
               key={tab}
