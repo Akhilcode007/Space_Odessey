@@ -174,7 +174,7 @@ export default function Sections({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-wider transition-all ${
               mobileViewMode === 'details'
-                ? 'bg-cyan-500 text-black font-bold shadow-md'
+                ? 'bg-white text-black font-bold shadow-md'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -189,7 +189,7 @@ export default function Sections({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-wider transition-all ${
               mobileViewMode === 'catalog'
-                ? 'bg-cyan-500 text-black font-bold shadow-md'
+                ? 'bg-white text-black font-bold shadow-md'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -481,7 +481,7 @@ export default function Sections({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-wider transition-all ${
               mobileModelMode === 'specs'
-                ? 'bg-cyan-500 text-black font-bold shadow-md'
+                ? 'bg-white text-black font-bold shadow-md'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -496,7 +496,7 @@ export default function Sections({
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] sm:text-[11px] font-mono tracking-wider transition-all ${
               mobileModelMode === 'catalog'
-                ? 'bg-cyan-500 text-black font-bold shadow-md'
+                ? 'bg-white text-black font-bold shadow-md'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >

@@ -42,6 +42,7 @@ const fragmentShader = `
     return c;
   }
 
+  // Pure White Light Sweep Shader for sleek Nothing OS aesthetic
   void main() {
     // 1. Rounded Corner Clipping
     vec2 halfSize = vec2(0.5, 0.5);
@@ -50,39 +51,31 @@ const fragmentShader = `
     float alpha = 1.0 - smoothstep(0.0, 0.015, dist);
     if (alpha <= 0.001) discard;
 
-    // 2. Chromatic Dispersion (RGB split based on movement)
-    float dispOffset = uDispersion * 0.018;
-    vec2 uvR = vUv + vec2(dispOffset, dispOffset * 0.4);
-    vec2 uvG = vUv;
-    vec2 uvB = vUv - vec2(dispOffset, dispOffset * 0.4);
-
-    vec4 texR = texture2D(uTexture, clamp(uvR, 0.0, 1.0));
-    vec4 texG = texture2D(uTexture, clamp(uvG, 0.0, 1.0));
-    vec4 texB = texture2D(uTexture, clamp(uvB, 0.0, 1.0));
-
-    vec3 baseColor = vec3(texR.r, texG.g, texB.b);
-    float baseAlpha = texG.a;
+    // 2. Texture Sampling (Clean sampling without rainbow distortion)
+    vec4 tex = texture2D(uTexture, vUv);
+    vec3 baseColor = tex.rgb;
+    float baseAlpha = tex.a;
 
     // 3. Monochrome / Desaturation calculation
     float gray = dot(baseColor, vec3(0.299, 0.587, 0.114));
     vec3 monoColor = vec3(gray);
 
-    // 4. Diagonal Prismatic Sweep Wavefront
+    // 4. Diagonal White Light Sweep Wavefront
     // Sweep line travels diagonally across the UV coordinates (x + y)
     float diag = (vUv.x * 0.7 + (1.0 - vUv.y) * 0.7); // range [0, 1.4]
     float sweepWave = smoothstep(diag - 0.25, diag + 0.05, uSweepTime * 1.5);
 
-    // Prismatic spectral glow right at the sweep edge
+    // Brilliant Pure White Light gleam right at the sweep wavefront edge
     float waveDist = abs(diag - uSweepTime * 1.35);
-    float spectralIntensity = exp(-waveDist * waveDist * 60.0) * uSweep;
-    vec3 spectralColor = spectrum(diag * 3.0 + uSweepTime);
+    float whiteGlow = exp(-waveDist * waveDist * 55.0) * uSweep;
+    vec3 whiteLight = vec3(1.0, 1.0, 1.0); // Pure White Switch Color
 
     // Effective saturation combining base saturation, hover peek, and sweep wavefront
     float effectiveSat = clamp(mix(uSaturation, 1.0, sweepWave) + uHover * 0.5, 0.0, 1.0);
     vec3 finalColor = mix(monoColor, baseColor, effectiveSat);
 
-    // Add prismatic spectral refraction band
-    finalColor += spectralColor * spectralIntensity * 0.85;
+    // Add pure white sweep illumination beam
+    finalColor += whiteLight * whiteGlow * 1.1;
 
     // Apply distance dimming
     finalColor *= (1.0 - uDim);
@@ -504,8 +497,8 @@ export const PrismCarousel = forwardRef(function PrismCarousel(
       {/* Top Telemetry / Status Row */}
       <div className="relative z-10 p-4 sm:p-6 flex items-center justify-between pointer-events-none">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-white/15 backdrop-blur-md text-[10px] sm:text-xs font-mono text-zinc-300">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
-          <span>PRISM COVERFLOW // 3D CHROMATIC DISPERSION</span>
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_#ffffff]" />
+          <span>PRISM COVERFLOW // WHITE LIGHT SWEEP</span>
         </div>
 
         {/* Counter Badge */}
@@ -521,7 +514,7 @@ export const PrismCarousel = forwardRef(function PrismCarousel(
         {/* Caption */}
         {captions && currentItem && (
           <div className="pointer-events-auto max-w-lg text-center sm:text-left">
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-cyan-300 uppercase tracking-widest mb-1.5">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-white/10 border border-white/15 text-[10px] font-mono text-white/90 uppercase tracking-widest mb-1.5">
               <span>EXPLORATION ARTIFACT #{String(currentIndex + 1).padStart(2, '0')}</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-1 drop-shadow-md">
@@ -535,12 +528,12 @@ export const PrismCarousel = forwardRef(function PrismCarousel(
           </div>
         )}
 
-        {/* Navigation Controls */}
+        {/* Navigation Controls / Switcher */}
         {controls && (
-          <div className="pointer-events-auto flex items-center gap-2 glass-panel p-1.5 rounded-full border border-white/20 shadow-2xl backdrop-blur-xl bg-black/70">
+          <div className="pointer-events-auto flex items-center gap-2 glass-panel p-1.5 rounded-full border border-white/25 shadow-2xl backdrop-blur-xl bg-black/80">
             <button
               onClick={goToPrevious}
-              className="p-2.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+              className="p-2.5 rounded-full text-white bg-white/5 hover:bg-white hover:text-black active:scale-95 transition-all"
               title="Previous Artifact (Left Arrow)"
               aria-label="Previous Slide"
             >
@@ -550,7 +543,7 @@ export const PrismCarousel = forwardRef(function PrismCarousel(
             {autoplay && (
               <button
                 onClick={() => setIsPaused((prev) => !prev)}
-                className="p-2.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                className="p-2.5 rounded-full text-white bg-white/5 hover:bg-white hover:text-black active:scale-95 transition-all"
                 title={isPaused ? 'Resume Autoplay' : 'Pause Autoplay'}
                 aria-label="Toggle Autoplay"
               >
@@ -560,7 +553,7 @@ export const PrismCarousel = forwardRef(function PrismCarousel(
 
             <button
               onClick={goToNext}
-              className="p-2.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+              className="p-2.5 rounded-full text-white bg-white/5 hover:bg-white hover:text-black active:scale-95 transition-all"
               title="Next Artifact (Right Arrow)"
               aria-label="Next Slide"
             >

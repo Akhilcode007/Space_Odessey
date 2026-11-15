@@ -94,7 +94,7 @@ export default function GallerySection({ onNavigate, onSelectModelId, onOpenDire
       <div className="pointer-events-auto flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/70 border border-white/15 text-[11px] font-mono tracking-widest text-zinc-300 backdrop-blur-xl shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] animate-pulse" />
             <span>SECTION 05 // CELESTIAL RELICS GALLERY</span>
           </div>
           <span className="hidden md:inline-block font-mono text-xs text-zinc-400 tracking-wider">
@@ -128,7 +128,7 @@ export default function GallerySection({ onNavigate, onSelectModelId, onOpenDire
           dim={0.25}
           sweep={1}
           sweepDuration={1.1}
-          dispersion={1}
+          dispersion={0}
           autoplay={true}
           interval={4.5}
           loop={true}
@@ -147,9 +147,9 @@ export default function GallerySection({ onNavigate, onSelectModelId, onOpenDire
       {/* Bottom Telemetry Prompts */}
       <div className="pointer-events-auto flex items-center justify-between text-[10px] sm:text-xs font-mono text-zinc-500 pt-2 border-t border-white/10 pr-20 sm:pr-48">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
           <span className="hidden sm:inline">
-            DRAG, SCROLL OR CLICK TO NAVIGATE // SPECTRAL CHROMATIC DISPERSION ACTIVE
+            DRAG, SCROLL OR CLICK TO NAVIGATE // WHITE LIGHT SWEEP ACTIVE
           </span>
           <span className="sm:hidden">SWIPE OR USE ARROWS TO BROWSE</span>
         </div>
