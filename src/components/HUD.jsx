@@ -4,7 +4,7 @@ import { Move } from 'lucide-react';
 export default function HUD({ activePlanet, scrollProgress = 0, isInteractingHotspot = false }) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-20 p-4 sm:p-6 pointer-events-none select-none">
-      <div className="max-w-7xl mx-auto flex items-end justify-end">
+      <div className="max-w-7xl mx-auto flex items-end justify-end pr-16 sm:pr-20">
         {/* Right Interaction Indicator & Progress Line */}
         <div className="pointer-events-auto flex flex-col items-end gap-2">
           {/* Status Badge */}

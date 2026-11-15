@@ -187,3 +187,4 @@ export default function SiteModel({
 // Preload official NASA models for instantaneous transitions
 useGLTF.preload('/apollo-lunar-module.glb');
 useGLTF.preload('/pioneer-10.glb');
+useGLTF.preload('/lunar-roving-vehicle.glb');

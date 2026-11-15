@@ -71,7 +71,7 @@ function SpaceScene({
   onSelectHotspot,
   onCloseHotspot,
   activePlanet,
-  selectedModelId = 'earth',
+  selectedModelId = 'apollo',
   onSelectModelId
 }) {
   const earthGroup = useRef();
@@ -79,6 +79,7 @@ function SpaceScene({
   const marsGroup = useRef();
   const apolloGroup = useRef();
   const pioneerGroup = useRef();
+  const lrvGroup = useRef();
   const controlsRef = useRef();
 
   const getPlanetX = (planet = activePlanet) => {
@@ -100,7 +101,8 @@ function SpaceScene({
       !moonGroup.current ||
       !marsGroup.current ||
       !apolloGroup.current ||
-      !pioneerGroup.current
+      !pioneerGroup.current ||
+      !lrvGroup.current
     )
       return;
 
@@ -127,6 +129,9 @@ function SpaceScene({
 
       gsap.to(pioneerGroup.current.position, { x: 35, y: -5, z: -20, duration, ease });
       gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+      gsap.to(lrvGroup.current.position, { x: 40, y: -5, z: -20, duration, ease });
+      gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
     } else if (activePlanet === 'moon') {
       // Earth slides far off-screen to the left
       gsap.to(earthGroup.current.position, { x: -24, y: 2, z: -12, duration, ease });
@@ -146,6 +151,9 @@ function SpaceScene({
 
       gsap.to(pioneerGroup.current.position, { x: 25, y: -5, z: -20, duration, ease });
       gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+      gsap.to(lrvGroup.current.position, { x: 30, y: -5, z: -20, duration, ease });
+      gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
     } else if (activePlanet === 'mars') {
       // Earth & Moon stay far off-screen to the left
       gsap.to(earthGroup.current.position, { x: -32, y: 4, z: -16, duration, ease });
@@ -164,6 +172,9 @@ function SpaceScene({
 
       gsap.to(pioneerGroup.current.position, { x: -30, y: -5, z: -20, duration, ease });
       gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+      gsap.to(lrvGroup.current.position, { x: -35, y: -5, z: -20, duration, ease });
+      gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
     } else if (activePlanet === 'models' || activePlanet === 'archive') {
       if (selectedModelId === 'earth') {
         // Earth featured front and center
@@ -181,6 +192,9 @@ function SpaceScene({
 
         gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       } else if (selectedModelId === 'moon') {
         // Moon featured front and center
         gsap.to(moonGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
@@ -197,6 +211,9 @@ function SpaceScene({
 
         gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       } else if (selectedModelId === 'mars') {
         // Mars featured front and center
         gsap.to(marsGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
@@ -213,6 +230,9 @@ function SpaceScene({
 
         gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       } else if (selectedModelId === 'apollo') {
         // Apollo Lunar Module featured front and center with Lunar Terrain
         gsap.to(apolloGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
@@ -230,6 +250,9 @@ function SpaceScene({
 
         gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       } else if (selectedModelId === 'pioneer') {
         // Pioneer 10 featured front and center with Planetary Encounter Terrain
         gsap.to(pioneerGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
@@ -247,6 +270,29 @@ function SpaceScene({
 
         gsap.to(apolloGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(apolloGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+      } else if (selectedModelId === 'lrv') {
+        // Lunar Roving Vehicle featured front and center with Lunar Terrain
+        gsap.to(lrvGroup.current.position, { x: px, y: 0, z: 0, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 1, y: 1, z: 1, duration, ease });
+
+        // Moon in background for celestial context
+        gsap.to(moonGroup.current.position, { x: -4.2, y: 1.2, z: -4.5, duration, ease });
+        gsap.to(moonGroup.current.scale, { x: 0.32, y: 0.32, z: 0.32, duration, ease });
+
+        gsap.to(earthGroup.current.position, { x: -28, y: 0, z: -16, duration, ease });
+        gsap.to(earthGroup.current.scale, { x: 0.1, y: 0.1, z: 0.1, duration, ease });
+
+        gsap.to(marsGroup.current.position, { x: 28, y: 0, z: -16, duration, ease });
+        gsap.to(marsGroup.current.scale, { x: 0.1, y: 0.1, z: 0.1, duration, ease });
+
+        gsap.to(apolloGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(apolloGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       } else {
         // Lineup showcase
         gsap.to(earthGroup.current.position, { x: -3.8, y: 0.2, z: -2.0, duration, ease });
@@ -263,6 +309,9 @@ function SpaceScene({
 
         gsap.to(pioneerGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
         gsap.to(pioneerGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
+
+        gsap.to(lrvGroup.current.position, { x: 0, y: -20, z: -20, duration, ease });
+        gsap.to(lrvGroup.current.scale, { x: 0.01, y: 0.01, z: 0.01, duration, ease });
       }
     }
 
@@ -410,6 +459,26 @@ function SpaceScene({
           }
         />
       </group>
+
+      {/* Section 6: Lunar Roving Vehicle (LRV) with Lunar Terrain */}
+      <group
+        ref={lrvGroup}
+        position={[40, -5, -20]}
+        scale={[0.01, 0.01, 0.01]}
+      >
+        <SiteModel
+          modelPath="/lunar-roving-vehicle.glb"
+          scale={0.55}
+          modelPosition={[0, -0.52, 0]}
+          modelRotation={[0, 0.45, 0]}
+          terrainType="lunar"
+          rotationSpeed={0.0012}
+          isActive={
+            (activePlanet === 'models' || activePlanet === 'archive') &&
+            selectedModelId === 'lrv'
+          }
+        />
+      </group>
     </>
   );
 }
@@ -420,7 +489,7 @@ export default function SpaceCanvas({
   onSelectHotspot,
   onCloseHotspot,
   activePlanet,
-  selectedModelId = 'earth',
+  selectedModelId = 'apollo',
   onSelectModelId
 }) {
   return (

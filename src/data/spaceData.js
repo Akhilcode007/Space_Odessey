@@ -71,78 +71,9 @@ export const CELESTIAL_BODIES = {
 
 export const CELESTIAL_MODELS_DATA = [
   {
-    id: 'earth',
-    name: 'EARTH DIGITAL TWIN',
-    tag: 'TERRESTRIAL SPHERE // 01',
-    format: 'GLTF 2.0 Binary (.glb)',
-    filesize: '12.9 MB',
-    scale: '1:1,000,000',
-    polygons: '32,400 Triangles',
-    textures: '4K PBR Diffuse / Normal / Specular',
-    features: [
-      'Atmospheric Rayleigh Scattering Rim Shader',
-      'High-Definition Continental Topography',
-      'Dynamic Day/Night Lighting Contrast',
-      'Real-Time Cursor Parallax Tilt Response'
-    ],
-    diameter: '12,742 KM',
-    orbitSpeed: '107,200 KM/H',
-    atmosphere: 'Nitrogen 78% / Oxygen 21% / Argon 0.9%',
-    nasaSource: 'NASA Earth Observatory / Blue Marble Next Generation',
-    modelPath: '/earth.glb',
-    color: '#3b82f6',
-    sitesTarget: 'earth'
-  },
-  {
-    id: 'moon',
-    name: 'LUNAR SURFACE TWIN',
-    tag: 'LUNAR CRATER RELIEF // 02',
-    format: 'GLTF 2.0 Binary (.glb)',
-    filesize: '3.3 MB',
-    scale: '1:1,000,000',
-    polygons: '24,800 Triangles',
-    textures: '4K Lunar Reconnaissance Orbiter (LRO) DEM',
-    features: [
-      'Photorealistic Impact Basin Micro-Relief',
-      '4 Official NASA Challenge Landing Sites',
-      'Apollo 11, 15, 17 & Surveyor III Hotspot Anchors',
-      'Inertial Damping Drag-to-Rotate 360°'
-    ],
-    diameter: '3,474.8 KM',
-    orbitSpeed: '3,683 KM/H',
-    atmosphere: 'Trace Exosphere (Helium, Neon, Hydrogen)',
-    nasaSource: 'NASA Lunar Reconnaissance Orbiter (LRO) LOLA Data',
-    modelPath: '/moon.glb',
-    color: '#e2e8f0',
-    sitesTarget: 'moon'
-  },
-  {
-    id: 'mars',
-    name: 'MARTIAN CRUST TWIN',
-    tag: 'RED PLANET TOPOGRAPHY // 03',
-    format: 'GLTF 2.0 Binary (.glb)',
-    filesize: '4.0 MB',
-    scale: '1:1,000,000',
-    polygons: '28,600 Triangles',
-    textures: '4K Mars Global Surveyor MOLA Altimetry',
-    features: [
-      'Iron-Oxide Regolith Mineral Textures',
-      '9 Official NASA Challenge Landing Sites',
-      'Perseverance, Curiosity, InSight & Viking 1 Anchors',
-      'Atmospheric Dust Haze Scattering Glow'
-    ],
-    diameter: '6,779 KM',
-    orbitSpeed: '86,677 KM/H',
-    atmosphere: 'CO2 95.3% / Nitrogen 2.6% / Argon 1.9%',
-    nasaSource: 'NASA Mars Odyssey THEMIS & MGS MOLA Database',
-    modelPath: '/mars.glb',
-    color: '#f97316',
-    sitesTarget: 'mars'
-  },
-  {
     id: 'apollo',
     name: 'APOLLO LUNAR MODULE',
-    tag: 'CREWED LUNAR LANDER // 04',
+    tag: 'CREWED LUNAR LANDER // 01',
     format: 'GLTF 2.0 Binary (.glb)',
     filesize: '700 KB',
     scale: '1:1 Scale Spacecraft Asset',
@@ -167,7 +98,7 @@ export const CELESTIAL_MODELS_DATA = [
   {
     id: 'pioneer',
     name: 'PIONEER 10 SPACECRAFT',
-    tag: 'DEEP SPACE EXPLORER // 05',
+    tag: 'DEEP SPACE EXPLORER // 02',
     format: 'GLTF 2.0 Binary (.glb)',
     filesize: '1.95 MB',
     scale: '1:1 Scale Spacecraft Asset',
@@ -188,6 +119,31 @@ export const CELESTIAL_MODELS_DATA = [
     modelPath: '/pioneer-10.glb',
     color: '#6366f1',
     sitesTarget: 'mars'
+  },
+  {
+    id: 'lrv',
+    name: 'LUNAR ROVING VEHICLE (LRV)',
+    tag: 'CREWED ELECTRIC BUGGY // 03',
+    format: 'GLTF 2.0 Binary (.glb)',
+    filesize: '2.10 MB',
+    scale: '1:1 Scale Spacecraft Asset',
+    polygons: '186,000 Triangles',
+    textures: 'PBR Wire Mesh Wheels & High-Gain Antenna',
+    features: [
+      'Boeing & Delco Electric Lunar Rover Chassis',
+      'Woven Zinc-Coated Steel Wire Mesh Wheels with Titanium Chevrons',
+      'High-Gain S-Band Color Television Camera & Dish Antenna',
+      'T-Handle Joystick Hand Controller & Dual DC Drive Motors'
+    ],
+    diameter: '3.1 M (Length) / 2.3 M (Wheelbase)',
+    orbitSpeed: 'Surface Mobility (13 KM/H)',
+    atmosphere: 'Lunar Surface (Airless Vacuum)',
+    nasaSource: 'NASA / Boeing / Tripo3D',
+    creditLine: 'Credit: NASA / Boeing / Tripo3D Community Model',
+    license: 'Public Domain / Free for Educational & Informational Use (NASA Guidelines)',
+    modelPath: '/lunar-roving-vehicle.glb',
+    color: '#38bdf8',
+    sitesTarget: 'moon'
   }
 ];
 
@@ -220,6 +176,7 @@ export const HOTSPOTS_DATA = {
     },
     {
       id: 'lunar-roving-vehicles',
+      modelId: 'lrv',
       title: 'Lunar Roving Vehicles (LRVs)',
       targetName: 'Lunar Roving Vehicles',
       shortLabel: 'Lunar Rover',

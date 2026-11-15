@@ -23,7 +23,7 @@ export default function Sections({
   onSelectHotspot,
   onOpenDirectory,
   onNavigate,
-  selectedModelId = 'earth',
+  selectedModelId = 'apollo',
   onSelectModelId
 }) {
   // Available artifacts for current planet strictly from NASA prompt document
@@ -350,12 +350,7 @@ export default function Sections({
                   key={spot.id}
                   onClick={() => {
                     soundManager.playTargetLock();
-                    if (spot.modelId) {
-                      onSelectModelId?.(spot.modelId);
-                      onNavigate('models');
-                    } else {
-                      onSelectHotspot(spot);
-                    }
+                    onSelectHotspot(spot);
                   }}
                   className={`w-full text-left p-4 rounded-2xl transition-all duration-300 flex items-center justify-between group border backdrop-blur-xl ${
                     isSelected
@@ -410,12 +405,123 @@ export default function Sections({
       )}
 
       {/* ========================================================
+          3B. 3D MODELS CATALOGUE (Like Catalog Sites)
+         ======================================================== */}
+      {(activePlanet === 'models' || activePlanet === 'archive') && (
+        <aside className="fixed top-20 right-6 sm:right-8 z-30 w-72 sm:w-84 max-w-[calc(100vw-3rem)] pointer-events-auto flex flex-col gap-3 animate-in fade-in slide-in-from-right-6 duration-300">
+          {/* Floating Target Pill Badge */}
+          <div className="flex justify-end mb-1">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#0c121c]/90 border border-white/20 backdrop-blur-xl shadow-[0_0_20px_rgba(6,182,212,0.15)]">
+              {/* Cyan Target Reticle Icon */}
+              <div className="relative flex items-center justify-center w-5 h-5 text-cyan-400 shrink-0">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4"
+                >
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M12 2v3" />
+                  <path d="M12 19v3" />
+                  <path d="M2 12h3" />
+                  <path d="M19 12h3" />
+                  <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+                </svg>
+              </div>
+              <span className="font-mono text-xs tracking-wider text-cyan-200 uppercase">
+                TARGET:{' '}
+                <span className="font-bold text-white tracking-wider">
+                  {currentModelMeta?.name || 'CELESTIAL ASSET'}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* Catalogue Header Row */}
+          <div className="flex items-center justify-between text-xs font-mono tracking-wider px-1 text-cyan-400 font-semibold mt-1">
+            <span className="tracking-widest uppercase">
+              3D MODELS CATALOG
+            </span>
+            <span className="tracking-widest">
+              {CELESTIAL_MODELS_DATA.length} MODELS
+            </span>
+          </div>
+
+          {/* Vertical Stack of Catalogue Model Cards */}
+          <div className="flex flex-col gap-2.5 overflow-y-auto max-h-[calc(100vh-14rem)] pr-1 select-none">
+            {CELESTIAL_MODELS_DATA.map((model, idx) => {
+              const isSelected = selectedModelId === model.id;
+              const numberPrefix = `0${idx + 1}.`;
+              return (
+                <button
+                  key={model.id}
+                  onClick={() => {
+                    soundManager.playTargetLock();
+                    onSelectModelId?.(model.id);
+                  }}
+                  className={`w-full text-left p-4 rounded-2xl transition-all duration-300 flex items-center justify-between group border backdrop-blur-xl ${
+                    isSelected
+                      ? 'bg-[#121824]/95 border-white/25 shadow-xl scale-[1.01]'
+                      : 'bg-[#0b0f17]/80 hover:bg-[#121824]/90 border-white/10 hover:border-white/20'
+                  }`}
+                  style={{
+                    boxShadow: isSelected
+                      ? '0 0 25px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.03)'
+                      : undefined
+                  }}
+                >
+                  <div className="min-w-0 pr-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-zinc-500 group-hover:text-cyan-400 transition-colors shrink-0">
+                        {numberPrefix}
+                      </span>
+                      <h4 className="text-sm font-bold font-sans tracking-tight text-white group-hover:text-cyan-200 transition-colors leading-snug truncate">
+                        {model.name}
+                      </h4>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider shrink-0">
+                        GLTF 2.0
+                      </span>
+                    </div>
+                    <p className="text-xs font-mono text-zinc-400 truncate mt-1">
+                      {model.tag || `${model.polygons} • ${model.filesize}`}
+                    </p>
+                  </div>
+
+                  {/* Red Chevron when active, dim when inactive */}
+                  <ChevronRight
+                    className={`w-4 h-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 ${
+                      isSelected ? 'text-[#eb2e2e]' : 'text-zinc-600 group-hover:text-zinc-400'
+                    }`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom Action: View 13 Relics Archive */}
+          <button
+            onClick={() => {
+              soundManager.playTargetLock();
+              onOpenDirectory();
+            }}
+            className="liquid-metal-btn flex items-center justify-center gap-2 p-3 rounded-2xl text-xs font-mono text-zinc-300 hover:text-white border border-white/15 mt-1"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
+            <span>VIEW 13 RELICS ARCHIVE</span>
+          </button>
+        </aside>
+      )}
+
+      {/* ========================================================
           4. 3D MODELS SECTION: INTERACTIVE CELESTIAL REPOSITORY
          ======================================================== */}
       {(activePlanet === 'models' || activePlanet === 'archive') && (
-        <div className="fixed inset-0 z-30 pointer-events-none flex flex-col justify-between p-4 sm:p-8 lg:p-12 pt-20 sm:pt-24 pb-14 animate-in fade-in duration-300">
-          {/* Top Bar: Section Badge & Model Selector Tabs */}
-          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="fixed inset-0 z-30 pointer-events-none flex flex-col justify-between p-4 sm:p-8 lg:p-12 pt-24 sm:pt-28 pb-14 animate-in fade-in duration-300">
+          {/* Top Bar: Section Badge (Clean layout without header overlap) */}
+          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/70 border border-white/15 text-[11px] font-mono tracking-widest text-zinc-300 backdrop-blur-xl shadow-lg">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" />
@@ -425,42 +531,12 @@ export default function Sections({
                 GLTF 2.0 DIGITAL TWINS
               </span>
             </div>
-
-            {/* Model Selector Tabs */}
-            <div className="flex items-center gap-1.5 p-1 rounded-full bg-black/80 border border-white/15 backdrop-blur-xl shadow-2xl flex-wrap">
-              {[
-                { id: 'earth', label: '01. EARTH' },
-                { id: 'moon', label: '02. MOON' },
-                { id: 'mars', label: '03. MARS' },
-                { id: 'apollo', label: '04. APOLLO LM' },
-                { id: 'pioneer', label: '05. PIONEER 10' },
-                { id: 'all', label: '06. TRIPLE VIEW' }
-              ].map((tab) => {
-                const isActive = selectedModelId === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      soundManager.playBlip(950, 0.04);
-                      onSelectModelId?.(tab.id);
-                    }}
-                    className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-mono font-medium tracking-wider transition-all duration-300 ${
-                      isActive
-                        ? 'bg-white text-black font-bold shadow-md scale-105'
-                        : 'text-zinc-400 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Left Floating Interactive Inspector Box */}
           <div className="pointer-events-auto max-w-md lg:max-w-lg w-full flex flex-col gap-3 my-auto">
             <div
-              className="glass-panel p-5 sm:p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden"
+              className="glass-panel p-5 sm:p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden max-h-[calc(100vh-14rem)] overflow-y-auto pr-1"
               style={{ background: 'rgba(10, 12, 18, 0.88)' }}
             >
               {/* Corner Glow */}
@@ -606,7 +682,7 @@ export default function Sections({
           </div>
 
           {/* Bottom Telemetry Prompts */}
-          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex items-center justify-between text-xs font-mono text-zinc-500 pt-2 border-t border-white/10">
+          <div className="pointer-events-auto max-w-7xl mx-auto w-full flex items-center justify-between text-xs font-mono text-zinc-500 pt-2 border-t border-white/10 pr-48 sm:pr-64">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               <span>CLICK & DRAG TO SPIN 3D MESH 360° // CURSOR PARALLAX ACTIVE</span>
@@ -616,7 +692,7 @@ export default function Sections({
                 soundManager.playBlip(700, 0.05);
                 onNavigate('earth');
               }}
-              className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
+              className="hidden lg:flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>RETURN TO ORIGIN (EARTH)</span>

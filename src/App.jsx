@@ -6,6 +6,7 @@ import Sections from './components/Sections';
 import ArtifactModal from './components/ArtifactModal';
 import QuizModal from './components/QuizModal';
 import SpaceGame from './components/SpaceGame';
+import ChatbotLauncher from './components/ChatbotLauncher';
 import { soundManager } from './utils/audio';
 import { HOTSPOTS_DATA } from './data/spaceData';
 
@@ -14,7 +15,7 @@ const SECTIONS = ['earth', 'moon', 'mars', 'models'];
 export default function App() {
   const [activePlanet, setActivePlanet] = useState('earth');
   const [selectedHotspot, setSelectedHotspot] = useState(null);
-  const [selectedModelId, setSelectedModelId] = useState('earth');
+  const [selectedModelId, setSelectedModelId] = useState('apollo');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isGameOpen, setIsGameOpen] = useState(false);
@@ -43,6 +44,9 @@ export default function App() {
     soundManager.playTransition();
     setSelectedHotspot(null);
     setActivePlanet(targetId);
+    if ((targetId === 'models' || targetId === 'archive') && (!selectedModelId || selectedModelId === 'earth' || selectedModelId === 'moon' || selectedModelId === 'mars')) {
+      setSelectedModelId('apollo');
+    }
   };
 
   const handleNextSection = () => {
@@ -202,6 +206,9 @@ export default function App() {
         onClose={() => setIsGameOpen(false)}
         destination={activePlanet === 'mars' ? 'mars' : 'moon'}
       />
+
+      {/* 8. Botpress AI AstroGuide Chatbot Floating Avatar Launcher */}
+      <ChatbotLauncher />
     </div>
   );
 }
